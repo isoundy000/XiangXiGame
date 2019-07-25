@@ -50,7 +50,12 @@ function NewClubSetLayer:onConfig()
         {"Panel_info"},
         {"Panel_playway"},
         {"Panel_record"},
-        {"Image_item"},
+        {"Image_item1"},
+        {"Image_item2"},
+        {"Image_item3"},
+        {"Image_item4"},
+        {"Image_item5"},
+        {"Image_item6"},
         {"ListView_playway"},
         {"ListView_record"},
         {"Panel_item"},
@@ -88,6 +93,7 @@ function NewClubSetLayer:onCreate(param)
     self.ListView_record:removeAllItems()
     self:initUI(param)
     self.ListView_playway:addScrollViewEventListener(handler(self, self.listViewEventListen))
+    Log.d(param)
 end
 
 function NewClubSetLayer:listViewEventListen(sender, evenType)
@@ -317,7 +323,6 @@ end
 function NewClubSetLayer:initUI(param)
     local data = param[1]
     local page = param[2]
-    Log.d(data)
     if type(data) ~= 'table' then
         printError('enter NewClubSetLayer data error')
         return
@@ -325,10 +330,6 @@ function NewClubSetLayer:initUI(param)
     self.clubData = data
     self:switchPage(page)
     self.ListView_record:addScrollViewEventListener(handler(self, self.recordEventListen))
-
-    if not (self.clubData.dwUserID == UserData.User.userID or self:isAdmin(UserData.User.userID)) then
-        self.Button_record:setVisible(false)
-    end
 end
 
 --切换分页
@@ -412,36 +413,19 @@ function NewClubSetLayer:initInfoPage()
 end
 
 function NewClubSetLayer:initWayPage()
-    self.ListView_playway:removeAllItems()
     for i,id in ipairs(self.clubData.dwPlayID) do
-        local item = self.Image_item:clone()
-        self.ListView_playway:pushBackCustomItem(item)
+        local item = self['Image_item' .. i]
         local Panel_noway = ccui.Helper:seekWidgetByName(item, 'Panel_noway')
         local Button_addway = ccui.Helper:seekWidgetByName(item, 'Button_addway')
         local Panel_yesway = ccui.Helper:seekWidgetByName(item, 'Panel_yesway')
-        local Text_gamewayIdx = ccui.Helper:seekWidgetByName(item, 'Text_gamewayIdx')
         local Text_wayname = ccui.Helper:seekWidgetByName(item, 'Text_wayname')
         local Text_waypeople = ccui.Helper:seekWidgetByName(item, 'Text_waypeople')
         local Text_waynums = ccui.Helper:seekWidgetByName(item, 'Text_waynums')
         local Text_wayLimit = ccui.Helper:seekWidgetByName(item, 'Text_wayLimit')
-        local Text_gamemode = ccui.Helper:seekWidgetByName(item, 'Text_gamemode')
         local Text_waytype = ccui.Helper:seekWidgetByName(item, 'Text_waytype')
         local Text_waydes = ccui.Helper:seekWidgetByName(item, 'Text_waydes')
-        local Text_addPlayWay = ccui.Helper:seekWidgetByName(item, 'Text_addPlayWay')
         local Button_removeWay = ccui.Helper:seekWidgetByName(item, 'Button_removeWay')
         local Button_modifyWay = ccui.Helper:seekWidgetByName(item, 'Button_modifyWay')
-
-        Text_gamewayIdx:setColor(cc.c3b(255, 0, 0))
-        Text_wayname:setColor(cc.c3b(199,107,61))
-        Text_waypeople:setColor(cc.c3b(199,107,61))
-        Text_waynums:setColor(cc.c3b(199,107,61))
-        Text_wayLimit:setColor(cc.c3b(199,107,61))
-        Text_waytype:setColor(cc.c3b(199,107,61))
-        Text_gamemode:setColor(cc.c3b(199,107,61))
-        Text_waydes:setColor(cc.c3b(85,42,42))
-        Text_addPlayWay:setColor(cc.c3b(120,6,6))
-
-        Text_gamewayIdx:setString('玩法'.. i)
         
         local kindid = self.clubData.wKindID[i]
         local gameinfo = StaticData.Games[kindid]
@@ -460,37 +444,36 @@ function NewClubSetLayer:initWayPage()
             local jushu = self.clubData.wGameCount[i]
             Text_waynums:setString(jushu .. '局')
             
-            Text_waytype:setVisible(true)
-            if self.clubData.isTableCharge[i] then
-                Text_wayLimit:setVisible(true)
-                local des = string.format('门槛:%d 倍率:%d', self.clubData.lTableLimit[i], self.clubData.wFatigueCell[i])
-                Text_wayLimit:setString(des)
+            local isOpen = self.clubData.isOpen[i]
+            if isOpen then
+                Text_waytype:setVisible(true)
+                Text_waydes:setPositionY(82)
+                if self.clubData.isTableCharge[i] then
+                    Text_wayLimit:setVisible(true)
+                    local des = string.format('门槛:%d 倍率:%d', self.clubData.lTableLimit[i], self.clubData.wFatigueCell[i])
+                    Text_wayLimit:setString(des)
+                else
+                    Text_wayLimit:setVisible(false)
+                end
+
+                local cbPayMode = self.clubData.cbPayMode[i]
+                if cbPayMode == 1 then
+                    local des = string.format('大赢家支付%s',self:getLimitDes(self.clubData.dwPayLimit[i], self.clubData.dwPayCount[i]))
+                    Text_waytype:setString(des)
+                elseif cbPayMode == 2 then
+                    local des = string.format('赢家支付%s',self:getLimitDes(self.clubData.dwPayLimit[i], self.clubData.dwPayCount[i]))
+                    Text_waytype:setString(des)
+                elseif cbPayMode == 3 then
+                    local des = string.format('AA支付:%d', self.clubData.dwPayCount[i][1])
+                    Text_waytype:setString(des)
+                else
+                    local des = string.format('免费')
+                    Text_waytype:setString(des)
+                end
             else
+                Text_waytype:setVisible(false)
                 Text_wayLimit:setVisible(false)
-            end
-
-            local cbMode = self.clubData.cbMode[i]
-            if cbMode == 1 then
-                Text_gamemode:setString('疲劳值模式')
-            elseif cbMode == 2 then
-                Text_gamemode:setString('元宝模式')
-            else
-                Text_gamemode:setString('圈主模式')
-            end
-
-            local cbPayMode = self.clubData.cbPayMode[i]
-            if cbPayMode == 1 then
-                local des = string.format('大赢家支付%s',self:getLimitDes(self.clubData.dwPayLimit[i], self.clubData.dwPayCount[i]))
-                Text_waytype:setString(des)
-            elseif cbPayMode == 2 then
-                local des = string.format('赢家支付%s',self:getLimitDes(self.clubData.dwPayLimit[i], self.clubData.dwPayCount[i]))
-                Text_waytype:setString(des)
-            elseif cbPayMode == 3 then
-                local des = string.format('AA支付:%d', self.clubData.dwPayCount[i][1])
-                Text_waytype:setString(des)
-            else
-                local des = string.format('免费')
-                Text_waytype:setString(des)
+                Text_waydes:setPositionY(120)
             end
             
             local desc = require("common.GameDesc"):getGameDesc(self.clubData.wKindID[i], self.clubData.tableParameter[i])
