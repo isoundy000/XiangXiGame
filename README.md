@@ -1,2 +1,0 @@
-# XiangXiGame
-sys need
