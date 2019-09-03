@@ -91,6 +91,8 @@ function InterfaceCreateRoomNode:SUB_GR_CREATE_TABLE_FAILED(event)
         require("common.MsgBoxLayer"):create(2,nil,"防沉迷配置错误,请联系群主重新设置!")
     elseif errorID == 23 then
         require("common.MsgBoxLayer"):create(2,nil,"亲友圈玩法不存在,请重新刷新亲友圈!")
+    elseif errorID == 24 then
+        require("common.MsgBoxLayer"):create(2,nil,"您的元宝不够,请及时充值!")
     else
         require("common.MsgBoxLayer"):create(2,nil,"请升级您的版本!")
     end
@@ -110,14 +112,21 @@ function InterfaceCreateRoomNode:SUB_GR_LOGON_SUCCESS(event)
             self.tableParameter.b4Add3,self.tableParameter.bShowCardCount,self.tableParameter.bSpringMinCount,self.tableParameter.bAbandon,
             self.tableParameter.bCheating,self.tableParameter.bFalseSpring,self.tableParameter.bAutoOutCard)
     elseif self.wKindID == 44 then
-        NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GR_USER,NetMsgId.REQ_GR_CREATE_TABLE,"diwwwwdbbbbbbwbbbbbbbbdbbbb",
+        NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GR_USER,NetMsgId.REQ_GR_CREATE_TABLE,"diwwwwdbbbbbbwbbbbbbbbdbbbbb",
             CHANNEL_ID,self.nTableType,self.wTableSubType,self.wKindID,self.wGameCount,1,self.dwTargetID,
             self.tableParameter.FanXing.bType,self.tableParameter.FanXing.bCount,self.tableParameter.FanXing.bAddTun,
             self.tableParameter.bPlayerCountType,self.tableParameter.bPlayerCount,self.tableParameter.bLaiZiCount,self.tableParameter.bMaxLost,
             self.tableParameter.bYiWuShi,self.tableParameter.bLiangPai,self.tableParameter.bCanHuXi,self.tableParameter.bHuType,
             self.tableParameter.bFangPao,self.tableParameter.bSettlement,self.tableParameter.bStartTun,self.tableParameter.bSocreType,
-            self.tableParameter.dwMingTang,self.tableParameter.bTurn,self.tableParameter.bPaoTips,self.tableParameter.bStartBanker,self.tableParameter.bDeathCard)
-
+            self.tableParameter.dwMingTang,self.tableParameter.bTurn,self.tableParameter.bPaoTips,self.tableParameter.bStartBanker,self.tableParameter.bDeathCard,
+            self.tableParameter.b468)
+    elseif self.wKindID == 51 or self.wKindID == 55 or self.wKindID == 56 or self.wKindID == 57 or self.wKindID == 58 or self.wKindID == 59 then
+            NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GR_USER,NetMsgId.REQ_GR_CREATE_TABLE,"diwwwwdbbbbbbbbbbbbb",
+                CHANNEL_ID,self.nTableType,self.wTableSubType,self.wKindID,self.wGameCount,1,self.dwTargetID,
+                self.tableParameter.bPlayerCount,self.tableParameter.bBankerType,self.tableParameter.bMultiple,self.tableParameter.bBettingType,
+                self.tableParameter.bSettlementType,self.tableParameter.bPush,self.tableParameter.bNoFlower,self.tableParameter.bCanPlayingJoin,
+                self.tableParameter.bNiuType_Flush,self.tableParameter.bNiuType_Gourd,self.tableParameter.bNiuType_SameColor,self.tableParameter.bNiuType_Straight,self.tableParameter.bCuopai)
+                
     elseif self.wKindID == 60 then
         NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GR_USER,NetMsgId.REQ_GR_CREATE_TABLE,"diwwwwdbbbbbbwbbbbbbbbdbbb",
             CHANNEL_ID,self.nTableType,self.wTableSubType,self.wKindID,self.wGameCount,1,self.dwTargetID,
@@ -127,13 +136,13 @@ function InterfaceCreateRoomNode:SUB_GR_LOGON_SUCCESS(event)
             self.tableParameter.bFangPao,self.tableParameter.bSettlement,self.tableParameter.bStartTun,self.tableParameter.bSocreType,
             self.tableParameter.dwMingTang,self.tableParameter.bTurn,self.tableParameter.bStartBanker,self.tableParameter.bDeathCard)  
     elseif self.wKindID == 83   then
-            NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GR_USER,NetMsgId.REQ_GR_CREATE_TABLE,"diwwwwdbbbbbbbbbbbbbbbbb",
+            NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GR_USER,NetMsgId.REQ_GR_CREATE_TABLE,"diwwwwdbbbbbbbbbbbbbbbbbbb",
                 CHANNEL_ID,self.nTableType,self.wTableSubType,self.wKindID,self.wGameCount,1,self.dwTargetID,
                 self.tableParameter.bPlayerCount, self.tableParameter.bStartCard,self.tableParameter.bBombSeparation,self.tableParameter.bRed10,
                 self.tableParameter.b4Add3,self.tableParameter.bShowCardCount,self.tableParameter.bSpringMinCount,self.tableParameter.bAbandon,
                 self.tableParameter.bCheating,self.tableParameter.bFalseSpring,self.tableParameter.bAutoOutCard,self.tableParameter.bThreeBomb,
                 self.tableParameter.b15Or16,self.tableParameter.bMustOutCard,self.tableParameter.bMustNextWarn,self.tableParameter.bJiaPiao,
-                self.tableParameter.bThreeEx)
+                self.tableParameter.bThreeEx,self.tableParameter.b4Add2,self.tableParameter.bHostedTime)  
     elseif self.wKindID == 84   then
             NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GR_USER,NetMsgId.REQ_GR_CREATE_TABLE,"diwwwwdbbbbbbb",
                 CHANNEL_ID,self.nTableType,self.wTableSubType,self.wKindID,self.wGameCount,1,self.dwTargetID,
@@ -179,20 +188,34 @@ function InterfaceCreateRoomNode:SUB_GR_LOGON_SUCCESS(event)
             self.tableParameter.bSettleType,self.tableParameter.bSurrenderStage,self.tableParameter.bRemoveKingCard,self.tableParameter.bRemoveSixCard,
             self.tableParameter.bPaiFei,self.tableParameter.bDaDaoEnd,self.tableParameter.bNoTXPlease, self.tableParameter.bNoLookCard, self.tableParameter.b35Down)
     elseif self.wKindID == 89 then
-        NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GR_USER,NetMsgId.REQ_GR_CREATE_TABLE,"diwwwwdbbbbbbwbbbbbbbbdbbbbbbb",
+        NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GR_USER,NetMsgId.REQ_GR_CREATE_TABLE,"diwwwwdbbbbbbwbbbbbbbbdbbbbbbbb",
             CHANNEL_ID,self.nTableType,self.wTableSubType,self.wKindID,self.wGameCount,1,self.dwTargetID,
             self.tableParameter.FanXing.bType,self.tableParameter.FanXing.bCount,self.tableParameter.FanXing.bAddTun,
             self.tableParameter.bPlayerCountType,self.tableParameter.bPlayerCount,self.tableParameter.bLaiZiCount,self.tableParameter.bMaxLost,
             self.tableParameter.bYiWuShi,self.tableParameter.bLiangPai,self.tableParameter.bCanHuXi,self.tableParameter.bHuType,
             self.tableParameter.bFangPao,self.tableParameter.bSettlement,self.tableParameter.bStartTun,self.tableParameter.bSocreType,
             self.tableParameter.dwMingTang,self.tableParameter.bTurn,self.tableParameter.bPaoTips,self.tableParameter.bStartBanker,
-            self.tableParameter.bDeathCard,self.tableParameter.bMingType,self.tableParameter.bMingWei,self.tableParameter.b3Long5Kan)  
+            self.tableParameter.bDeathCard,self.tableParameter.bMingType,self.tableParameter.bMingWei,self.tableParameter.b3Long5Kan,
+            self.tableParameter.bHostedTime)  
 
     elseif self.wKindID == 88 then
         NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GR_USER,NetMsgId.REQ_GR_CREATE_TABLE,"diwwwwdbbbbdb",
             CHANNEL_ID,self.nTableType,self.wTableSubType,self.wKindID,self.wGameCount,1,self.dwTargetID,
             self.tableParameter.bPlayerCount,self.tableParameter.bDeathCard,self.tableParameter.bZhuangFen,
             self.tableParameter.bChongFen,self.tableParameter.dwMingTang,self.tableParameter.bChiNoPeng)  
+
+    elseif self.wKindID == 90  then
+        NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GR_USER,NetMsgId.REQ_GR_CREATE_TABLE,"diwwwwdbbbbbbbb",
+            CHANNEL_ID,self.nTableType,self.wTableSubType,self.wKindID,self.wGameCount,1,self.dwTargetID,
+            self.tableParameter.bPlayerCount,self.tableParameter.bDiFen,self.tableParameter.bFKSLaiZi,self.tableParameter.bZhenSanPiXi,
+            self.tableParameter.bDiSha,self.tableParameter.bChaoShiQiPai,self.tableParameter.bCanPlayingJoin,self.tableParameter.bJiaZhuTwo)
+    elseif self.wKindID == 91  then
+        NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GR_USER,NetMsgId.REQ_GR_CREATE_TABLE,"diwwwwdbbdbbbdbwddooooo",
+            CHANNEL_ID,self.nTableType,self.wTableSubType,self.wKindID,self.wGameCount,1,self.dwTargetID,
+            self.tableParameter.bPlayerCount,self.tableParameter.bPlayWayType,self.tableParameter.dwBaseSorce,self.tableParameter.bCompareCardCount,
+            self.tableParameter.bSameCard,self.tableParameter.bMaxLunCount,self.tableParameter.dwMaxOutSorce,self.tableParameter.bMastFloorCount,
+            self.tableParameter.wQuitTimer,self.tableParameter.dwTHMoney,self.tableParameter.dwBZMoney,self.tableParameter.bQuickMode,
+            self.tableParameter.bCanPlayingJoin,self.tableParameter.bCanTouchCard,self.tableParameter.bMaxA23,self.tableParameter.bCompareCardDoubleSorce)                    
     else
     end
 end

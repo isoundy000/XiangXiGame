@@ -275,6 +275,11 @@ function PDKTableLayer:doAction(action,pBuffer)
             if pBuffer.bUserCardCount == 7 then
                 PDKGameCommon:playAnimation(self.root, "四带三",pBuffer.wOutCardUser)
             end
+
+        elseif targetType == PDKGameCommon.CardType_4Add2 then
+            if pBuffer.bUserCardCount == 6 then
+                PDKGameCommon:playAnimation(self.root, "四带二",pBuffer.wOutCardUser)
+            end
         elseif targetType == PDKGameCommon.CardType_bomb then
             PDKGameCommon:playAnimation(self.root, "炸弹",pBuffer.wOutCardUser)
         -- else
@@ -418,6 +423,11 @@ function PDKTableLayer:showCountDown(wChairID,isHide)
                 local meChairID = PDKGameCommon:getRoleChairID()
                 local xiajia = (meChairID+1)%wPlayerCount
                 local uiImage_outTips = ccui.Helper:seekWidgetByName(self.root,"Image_outTips")
+                if PDKGameCommon.player[xiajia].bUserWarn == true and PDKGameCommon.gameConfig.bMustNextWarn == 0 then 
+                    Button_notoutCard:setVisible(false)
+                    Button_tips:setPositionX(426.81)
+                    Button_outCard:setPositionX(755.58)
+                end 
                 uiImage_outTips:setVisible(PDKGameCommon.player[xiajia].bUserWarn)
             end
         else
@@ -1771,7 +1781,7 @@ function PDKTableLayer:getCardTypeAndCard(bCardData,bUserCardCount)
         end
     end
     
-    if PDKGameCommon.gameConfig.b4Add3 and bUserCardCount >= 6 and bUserCardCount <= 7 and #tableSortCard[4] == 1 then
+    if PDKGameCommon.gameConfig.b4Add3 and bUserCardCount == 7 and #tableSortCard[4] == 1 then
         --是否为四带三
         local tableReturnCard = clone(tableSortCard[4][1])
         tableSortCard[4] = {}
@@ -1787,6 +1797,22 @@ function PDKTableLayer:getCardTypeAndCard(bCardData,bUserCardCount)
         end
     end 
        
+    if PDKGameCommon.gameConfig.b4Add2 and bUserCardCount == 6  and #tableSortCard[4] == 1 then
+        --是否为四带二
+        local tableReturnCard = clone(tableSortCard[4][1])
+        tableSortCard[4] = {}
+        for key, var in pairs(tableSortCard) do
+        	for k, v in pairs(var) do
+                for ikey, ivar in pairs(v) do
+                    table.insert(tableReturnCard,#tableReturnCard+1,ivar)
+                end
+        	end
+        end
+        if #tableReturnCard == bUserCardCount then
+            return PDKGameCommon.CardType_4Add2, tableReturnCard
+        end
+    end 
+
     --炸弹是否可以拆
     if PDKGameCommon.gameConfig.bBombSeparation == 1 then
         for key, var in pairs(tableSortCard[4]) do
@@ -2208,7 +2234,7 @@ function PDKTableLayer:getExtractCardType(bCardData,bUserCardCount,bTargetCardDa
             end
         end
     end
-    
+  
     --提取四带三
     if PDKGameCommon.gameConfig.b4Add3 == 1 and(targetType == PDKGameCommon.CardType_4Add3) then
         local tableSortCardTemp = clone(tableSortCard)
@@ -2247,6 +2273,53 @@ function PDKTableLayer:getExtractCardType(bCardData,bUserCardCount,bTargetCardDa
                             if #tableReturnCard%7 == 0 then break end
                         end
                         if #tableReturnCard%7 == 0 then break end
+                    end
+                end
+                if targetCardData == nil or (targetCardData ~= nil and #tableReturnCard == #targetCardData) then
+                    table.insert(tableCard,#tableCard+1,tableReturnCard)
+                end
+            end
+        end
+    end
+
+    --提取四带二
+    if PDKGameCommon.gameConfig.b4Add2 == 1 and(targetType == PDKGameCommon.CardType_4Add2) then
+        local tableSortCardTemp = clone(tableSortCard)
+        for key, var in pairs(tableSortCardTemp[4]) do
+            local value = Bit:_and(var[1],0x0F)
+            if value == 1 then
+                value = 14
+            elseif value == 2 then
+                value = 15
+            end
+            if value > targetValue then
+                local tableReturnCard = clone(var)
+                --补3个
+                if #tableReturnCard%6 ~= 0 then
+                    for k, v in pairs(tableSortCardTemp[1]) do
+                        for kKey, vVar in pairs(v) do
+                            table.insert(tableReturnCard,#tableReturnCard+1,vVar)
+                            if #tableReturnCard%6 == 0 then break end
+                        end
+                        if #tableReturnCard%6 == 0 then break end
+                    end
+                end
+                if #tableReturnCard%6 ~= 0 then
+                    for k, v in pairs(tableSortCardTemp[2]) do
+                        for kKey, vVar in pairs(v) do
+                            table.insert(tableReturnCard,#tableReturnCard+1,vVar)
+                            if #tableReturnCard%6 == 0 then break end
+                        end
+                        if #tableReturnCard%6 == 0 then break end
+                    end
+                end
+                if #tableReturnCard%6 ~= 0 then
+                    for k, v in pairs(tableSortCardTemp[3]) do
+                        for kKey, vVar in pairs(v) do
+                            table.insert(tableReturnCard,#tableReturnCard+1,vVar)
+                            if #tableReturnCard%6 == 0 then break end
+                        end
+                        if #tableReturnCard%6 == 0 then break end
                     end
                 end
                 if targetCardData == nil or (targetCardData ~= nil and #tableReturnCard == #targetCardData) then

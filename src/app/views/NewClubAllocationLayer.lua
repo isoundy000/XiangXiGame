@@ -49,7 +49,7 @@ end
 function NewClubAllocationLayer:onCreate(param)
 	self.data = param[1]
 	self.memberReqState = 0 -- 0 请求中 1-请求结束 2--全部请求结束
-    self.curClubIndex = 0
+    self.curClubIndex = 1
 	self:reqNotPartnerMember()
 	self.ScrollView_1:addEventListenerScrollView(handler(self, self.scrollEventListen))
 
@@ -88,9 +88,7 @@ end
 
 
 function NewClubAllocationLayer:reqNotPartnerMember()
- 	local startPos = self.curClubIndex + 1
-    local endPos = startPos + MEMBER_NUM - 1
-    UserData.Guild:getClubNotPartnerMember(self.data.dwClubID, startPos, endPos)
+    UserData.Guild:getClubNotPartnerMember(2, self.curClubIndex, self.data.dwClubID)
 end
 
 function NewClubAllocationLayer:scrollEventListen(sender, evenType)
@@ -174,7 +172,7 @@ function NewClubAllocationLayer:RET_GET_CLUB_NOT_PARTNER_MEMBER_FINISH(event)
     else
         self.memberReqState = 1
     end
-    self.curClubIndex = self.curClubIndex + MEMBER_NUM
+    self.curClubIndex = self.curClubIndex + 1
     self:refreshNotParnterMemPos()
 end
 

@@ -102,6 +102,7 @@ function NewClubInfoLayer:onEnter()
     EventMgr:registListener(EventType.RET_UPDATE_CLUB_PLAYER_INFO ,self,self.RET_UPDATE_CLUB_PLAYER_INFO)
     EventMgr:registListener(EventType.RET_SETTINGS_CLUB_MEMBER ,self,self.RET_SETTINGS_CLUB_MEMBER)
     EventMgr:registListener(EventType.SUB_CL_USER_INFO ,self,self.SUB_CL_USER_INFO)
+    EventMgr:registListener(EventType.RET_SETTINGS_CONFIG ,self,self.RET_SETTINGS_CONFIG)
 
     EventMgr:registListener(EventType.RET_CLUB_CHAT_GET_UNREAD_MSG, self, self.RET_CLUB_CHAT_GET_UNREAD_MSG)  -- 返回未读聊天信息
     cc.UserDefault:getInstance():setStringForKey("UserDefault_Operation","NewClubInfoLayer")
@@ -127,6 +128,7 @@ function NewClubInfoLayer:onExit()
     EventMgr:unregistListener(EventType.RET_UPDATE_CLUB_PLAYER_INFO ,self,self.RET_UPDATE_CLUB_PLAYER_INFO)
     EventMgr:unregistListener(EventType.RET_SETTINGS_CLUB_MEMBER ,self,self.RET_SETTINGS_CLUB_MEMBER)
     EventMgr:unregistListener(EventType.SUB_CL_USER_INFO ,self,self.SUB_CL_USER_INFO)
+    EventMgr:unregistListener(EventType.RET_SETTINGS_CONFIG ,self,self.RET_SETTINGS_CONFIG)
 
     EventMgr:unregistListener(EventType.RET_CLUB_CHAT_GET_UNREAD_MSG, self, self.RET_CLUB_CHAT_GET_UNREAD_MSG)
     if self.clubData ~= nil then
@@ -142,6 +144,7 @@ function NewClubInfoLayer:onCreate(param)
 
     self.Chat = UserData.Chat -- 俱乐部聊天信息
 
+    self.Button_mp:setVisible(false)
     self.Panel_bg:setVisible(false)
     self.Panel_ui:setVisible(false)
     self.Image_checkRedPoint:setVisible(false)
@@ -201,6 +204,7 @@ function NewClubInfoLayer:onCreate(param)
         local box = require("app.MyApp"):create(clubData,isAdmin):createView('NewClubRecord')
         self:addChild(box)
     end
+    -- self.Button_mem:setVisible(false)
 end
 
 
@@ -454,10 +458,10 @@ function NewClubInfoLayer:createClubTable()
             index = index + 1
             local parameter = self.clubData.tableParameter[i]
             local playerNum = parameter.bPlayerCount
-            local path = string.format('kwxclub/newclub_z%d.png', playerNum)
-            -- if playerNum > 4 then
-            --     path = 'newclub/newclub_tbl.png'
+            -- if playerNum == 6 then
+            --     playerNum = 8
             -- end
+            local path = string.format('kwxclub/newclub_z%d.png', playerNum)
             local item = self.Button_tblItem:clone()
             item:setScale(TableScale)
             self.ScrollView_clubTbl:addChild(item)
@@ -480,9 +484,20 @@ function NewClubInfoLayer:createClubTable()
 
             local panel = nil
             if playerNum > 4 then
-                panel = ccui.Helper:seekWidgetByName(item,"Panel_tbl6")
+                panel = ccui.Helper:seekWidgetByName(item,"Panel_tbl" .. playerNum)
             else
                 panel = ccui.Helper:seekWidgetByName(item,"Panel_normal")
+                local Image_tableType = ccui.Helper:seekWidgetByName(item,"Image_tableType")
+                if gameinfo.type == 1 then
+                    Image_tableType:setVisible(true)
+                    Image_tableType:loadTexture('kwxclub/zipai.png')
+                elseif gameinfo.type == 2 then
+                    Image_tableType:setVisible(true)
+                    Image_tableType:loadTexture('kwxclub/puke.png')
+                elseif gameinfo.type == 3 then
+                    Image_tableType:setVisible(true)
+                    Image_tableType:loadTexture('kwxclub/majiang.png')
+                end
             end
             panel:setVisible(true)
             
@@ -501,8 +516,9 @@ function NewClubInfoLayer:createClubTable()
             uiText_turnNum:setString(jushu .. '局')
             
             local Image_tableIdx = ccui.Helper:seekWidgetByName(item,"Image_tableIdx")
+            local BitmapFontLabel_tableIdx = ccui.Helper:seekWidgetByName(item,"BitmapFontLabel_tableIdx")
             Image_tableIdx:setVisible(true)
-            Image_tableIdx:loadTexture(string.format('kwxclub/club_%d.png', 100 + index))
+            BitmapFontLabel_tableIdx:setString(index)
 
             Common:addTouchEventListener(item,function(sender,event)
                 local isDisableCB = function()
@@ -608,7 +624,21 @@ function NewClubInfoLayer:updateClubInfo()
     Common:requestUserAvatar(self.clubData.dwUserID, self.clubData.szLogoInfo, self.Image_head, "clip")
     self.Text_clubName:setString(self.clubData.szClubName)
     self.Text_clubID:setString("圈ID:" .. self.clubData.dwClubID)
-    self.Text_clubPeople:setString("人数:" .. self.clubData.dwOnlinePlayerCount .. '/' .. self.clubData.dwClubPlayerCount)
+
+    if UserData.User.userID == self.clubData.dwUserID or self:isAdmin(UserData.User.userID)  then
+        self.Text_clubPeople:setString("人数:" .. self.clubData.dwOnlinePlayerCount .. '/' .. self.clubData.dwClubPlayerCount)
+    else
+        local onlineCount = self.clubData.dwOnlinePlayerCount
+        local allCount = self.clubData.dwClubPlayerCount
+        if onlineCount > 99 then
+            onlineCount = '99+'
+        end
+        if allCount > 99 then
+            allCount = '99+'
+        end
+        self.Text_clubPeople:setString("人数:" .. onlineCount .. '/' .. allCount)
+    end
+
     self.Button_custom:setVisible(self.clubData.bHaveCustomizeRoom)
     if self.clubData.dwUserID ~= UserData.User.userID and not self:isAdmin(UserData.User.userID) then
     else
@@ -623,9 +653,9 @@ function NewClubInfoLayer:updateClubInfo()
         self.ScrollView_clubTbl:setVisible(false)
         self.Image_noSetWayFlag:setVisible(true)
         if UserData.User.userID == self.clubData.dwUserID or self:isAdmin(UserData.User.userID) then
-            self.Image_contextTips:loadTexture('newclub/newclub_m25.png')
+            self.Image_contextTips:loadTexture('kwxclub/newclub_m25.png')
         else
-            self.Image_contextTips:loadTexture('newclub/newclub_m24.png')
+            self.Image_contextTips:loadTexture('kwxclub/newclub_m24.png')
         end
     end
 
@@ -845,10 +875,11 @@ function NewClubInfoLayer:refreshTableOneByOne(data)
         self.ScrollView_clubTbl:addChild(item)
         item:setName('club_table_' .. data.dwTableID)
         local Image_tableIdx = ccui.Helper:seekWidgetByName(item,"Image_tableIdx")
+        local BitmapFontLabel_tableIdx = ccui.Helper:seekWidgetByName(item,"BitmapFontLabel_tableIdx")
         local idx = self:getMoreTableIndex(data.wTableSubType)
         if idx then
             Image_tableIdx:setVisible(true)
-            Image_tableIdx:loadTexture(string.format('kwxclub/club_%d.png', 100 + idx))
+            BitmapFontLabel_tableIdx:setString(idx)
         else
             Image_tableIdx:setVisible(false)
         end
@@ -875,24 +906,25 @@ function NewClubInfoLayer:refreshTableOneByOne(data)
     end
 
     local playerNum = data.tableParameter.bPlayerCount
-    if  playerNum <= 4 then         --data.wTableSubType == 1 and
-        local path = string.format('kwxclub/newclub_z%d.png', playerNum)
-        item:loadTextures(path,path,path)
-        -- local Image_tableIdx = ccui.Helper:seekWidgetByName(item,"Image_tableIdx")
-        -- Image_tableIdx:setVisible(false)
-    elseif playerNum > 4 then
-        -- local path = 'newclub/newclub_tbl.png'
-        -- item:loadTextures(path,path,path)
-    else
-        local path = string.format('kwxclub/newclub_z%d.png', playerNum)
-        -- item:loadTextures(path,path,path)
-    end
-    
+    local path = string.format('kwxclub/newclub_z%d.png', playerNum)
+    item:loadTextures(path,path,path)
+        
     local itemNode = nil
     local headNum = 4
     if playerNum <= 4 then
         headNum = playerNum
         itemNode = ccui.Helper:seekWidgetByName(item,"Panel_normal")
+        local Image_tableType = ccui.Helper:seekWidgetByName(item,"Image_tableType")
+        if StaticData.Games[data.wKindID].type == 1 then
+            Image_tableType:setVisible(true)
+            Image_tableType:loadTexture('kwxclub/zipai.png')
+        elseif StaticData.Games[data.wKindID].type == 2 then
+            Image_tableType:setVisible(true)
+            Image_tableType:loadTexture('kwxclub/puke.png')
+        elseif StaticData.Games[data.wKindID].type == 3 then
+            Image_tableType:setVisible(true)
+            Image_tableType:loadTexture('kwxclub/majiang.png')
+        end
     else
         headNum = playerNum
         itemNode = ccui.Helper:seekWidgetByName(item,"Panel_tbl" .. playerNum)
@@ -918,7 +950,7 @@ function NewClubInfoLayer:refreshTableOneByOne(data)
     -- uiText_roomId:setString('房间号:' .. data.dwTableID)
     local uiText_turnNum = ccui.Helper:seekWidgetByName(itemNode,"Text_turnNum")
     uiText_turnNum:setVisible(true)
-    uiText_turnNum:setString(data.wCurrentGameCount .. '/' .. data.wGameCount)
+    uiText_turnNum:setString(data.wCurrentGameCount .. '/' .. data.wGameCount.."局")
 
     --字体大小调整
     -- uiText_wayName:setFontSize(22)
@@ -1165,9 +1197,22 @@ function NewClubInfoLayer:addOnceClubItem(data)
     Text_playWay:setColor(cc.c3b(114, 67, 13))
     Text_leader:setString(data.szClubName)
     Text_playWay:setString("圈ID:" .. data.dwClubID)
-    Text_memNum:setString("人数：" .. data.dwOnlinePlayerCount .. '/' .. data.dwClubPlayerCount)
-    self:setMemberMgrFlag(item, data)
 
+    if UserData.User.userID == self.clubData.dwUserID or self:isAdmin(UserData.User.userID)  then
+        Text_memNum:setString("人数：" .. data.dwOnlinePlayerCount .. '/' .. data.dwClubPlayerCount)
+    else
+        local onlineCount = data.dwOnlinePlayerCount
+        local allCount = data.dwClubPlayerCount
+        if onlineCount > 99 then
+            onlineCount = '99+'
+        end
+        if allCount > 99 then
+            allCount = '99+'
+        end
+        Text_memNum:setString("人数:" .. onlineCount .. '/' .. allCount)
+    end
+
+    self:setMemberMgrFlag(item, data)
     item:setTouchEnabled(true)
     item:addClickEventListener(function(sender)
         if self.lastSelLight then
@@ -1189,10 +1234,10 @@ function NewClubInfoLayer:setMemberMgrFlag(item, data)
     local Image_adminIcon = self:seekWidgetByNameEx(item, "Image_adminIcon")
     if data.dwUserID == UserData.User.userID then
         Image_adminIcon:setVisible(true)
-        Image_adminIcon:loadTexture('newclub/newclub_m22.png')
+        Image_adminIcon:loadTexture('kwxclub/newclub_m22.png')
     elseif self:isAdmin(UserData.User.userID, data.dwAdministratorID) then
         Image_adminIcon:setVisible(true)
-        Image_adminIcon:loadTexture('newclub/newclub_m21.png')
+        Image_adminIcon:loadTexture('kwxclub/newclub_m21.png')
     else
         Image_adminIcon:setVisible(false)
     end
@@ -1287,6 +1332,7 @@ function NewClubInfoLayer:RET_REFRESH_CLUB(event)
     UserData.Guild:saveLastUseClubRecord(self.clubData.dwClubID)
     cc.UserDefault:getInstance():setIntegerForKey("UserDefault_NewClubID", self.clubData.dwClubID)
     self:updateClubInfo()
+    UserData.Guild:getPartnerConfig(UserData.User.userID, self.clubData.dwClubID)
 end
 
 --返回刷新俱乐部玩法
@@ -1424,12 +1470,16 @@ function NewClubInfoLayer:RET_UPDATE_CLUB_PLAYER_INFO(event)
     self.Text_pilaozhi:setString('疲劳值:' .. data.lFatigueValue)
     self.userOffice = data.cbOffice
     self.userFatigueValue = data.lFatigueValue
+
+    -- if self.userOffice ~= 2 then
+    --     self.Button_mem:setVisible(true)
+    -- end
 end
 
 function NewClubInfoLayer:RET_SETTINGS_CLUB_MEMBER(event)
     local data = event._usedata
     Log.d(data)
-    if data.cbSettingsType == 6 and data.dwUserID == UserData.User.userID then
+    if (data.cbSettingsType == 6 or data.cbSettingsType == 8) and (data.dwUserID == UserData.User.userID) then
         --疲劳值
         self.userFatigueValue = data.lFatigueValue
         self.Text_pilaozhi:setString('疲劳值:' .. data.lFatigueValue)
@@ -1455,6 +1505,17 @@ end
 function NewClubInfoLayer:SUB_CL_USER_INFO(event)
     print('刷新名片：', UserData.User.szErWeiMaLogo)
     Common:requestErWeiMaPicture(UserData.User.szErWeiMaLogo, self.Image_mp)
+end
+
+function NewClubInfoLayer:RET_SETTINGS_CONFIG(event)
+    local data = event._usedata
+    Log.d(data)
+
+    if data.lRet ~= 0 then
+        --require("common.MsgBoxLayer"):create(0,nil,"获取合伙人配置信息失败！")
+        return
+    end
+    self:megerClubData(data)
 end
 
 return NewClubInfoLayer

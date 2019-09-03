@@ -76,10 +76,10 @@ function NewRecord:onCreate(params)
 	self.oldTips = nil
 	self:initUI()
 	self:initRecordData()
-	self.cellSize = cc.size(1040, 175) --宽 高
-	self.viewSize = cc.size(1030, 580)
+	self.cellSize = cc.size(1030, 185) --宽 高
+	self.viewSize = cc.size(1030, 560)
 	self.listView = Common:_createList(self.viewSize, handler(self, self._itemUpdateCall), self.cellSize.width, self.cellSize.height, handler(self, self.getDataCount), nil, nil, nil, false)
-	self.listView:setPosition(cc.p(257,60))
+	self.listView:setPosition(cc.p(257,80)) 
 	self.listView:setBounceable(false)
 	self.Panel_record:addChild(self.listView)
 	self:reqRecord(DAY_TYPE.TODAY,RECORD_TYPE.PERSON_RECORD)
@@ -227,7 +227,7 @@ function NewRecord:onClickTopRecord( sender )
 	print('点击了',sender:getName())
 end
 
-function NewRecord:onClose(  )
+function NewRecord:onClose()
 	self:gotoPage()
 end
 

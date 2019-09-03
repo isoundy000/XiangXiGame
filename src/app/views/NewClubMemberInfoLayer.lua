@@ -49,8 +49,10 @@ function NewClubMemberInfoLayer:onCreate(params)
 	Log.d(params[1])
 	local data = params[1]
 	local clubData = params[2]
+    local userOffice = params[3]
 	self.data = data
 	self.clubData = clubData
+    self.userOffice = userOffice
 	self:initUI()
 
     local function textFieldEvent(sender, eventType)
@@ -183,6 +185,10 @@ function NewClubMemberInfoLayer:initUI()
             self.Button_setDes:setVisible(false)
             self.TextField_des:setTouchEnabled(false)
         end
+
+        if self.userOffice == 3 and self.clubData.bIsPartnerRemoveMember then
+            self.Button_memOut:setVisible(true)
+        end
     end
     self:setStopPlayState(self.data.isProhibit)
 end
@@ -229,7 +235,15 @@ function NewClubMemberInfoLayer:RET_SETTINGS_CLUB(event)
     local data = event._usedata
     Log.d(data)
     if data.lRet ~= 0 then
-        require("common.MsgBoxLayer"):create(0,nil,"管理员已达上限或数据异常!")
+        if data.lRet == 1 then
+            require("common.MsgBoxLayer"):create(0,nil,"权限不足!")
+        elseif data.lRet == 2 then
+            require("common.MsgBoxLayer"):create(0,nil,"非合伙人和非合伙人成员才能设置为管理员!")
+        elseif data.lRet == 3 then
+            require("common.MsgBoxLayer"):create(0,nil,"管理员人数已达上限!")
+        else
+            require("common.MsgBoxLayer"):create(0,nil,"设置错误!")
+        end
         return
     end
 

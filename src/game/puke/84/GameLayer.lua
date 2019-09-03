@@ -323,6 +323,8 @@ function GameLayer:readBuffer(luaFunc, mainCmdID, subCmdID)
             data.location = {}
             data.location.x = luaFunc:readRecvDouble()
             data.location.y = luaFunc:readRecvDouble()
+            
+            
             data.other = nil
             data.bUserCardCount = 0
             data.cbCardData = nil

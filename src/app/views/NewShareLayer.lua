@@ -53,7 +53,7 @@ function NewShareLayer:onCreate(params)
                 require("common.MsgBoxLayer"):create(0,nil,"分享失败")  
             end
         end)
-        require("app.MyApp"):create(data):createView("ShareLayer")   
+    --    require("app.MyApp"):create(data):createView("ShareLayer")   
     end)
 
     local Button_PengShare = ccui.Helper:seekWidgetByName(self.root,"Button_PengShare")

@@ -14,7 +14,9 @@ local StatisticsLayer = class("StatisticsLayer", cc.load("mvc").ViewBase)
 local MEMBER_NUM = 7
 local STAITSTICS = {
     PLAY_STATICS = 1,
-    DAY_STATICS = 2
+    DAY_STATICS = 2,
+    PLZ_STATICS = 3,
+    ZZJ_STATICS = 4
 }
 
 local ChildStatics = {
@@ -47,6 +49,19 @@ function StatisticsLayer:onConfig()
         {'ListView_personal'},
         {'TextField_minscore'},
         {'ListView_all'},
+
+        {"Panel_plz_statics"},
+        {"Text_bigwimTittle"},
+        {"Panel_plz_template"},
+        {"Text_all_sell_num"},
+        {"Text_all_consume_num"},
+        {"Text_all_remain_num"},
+        {"Image_recordFrame"},
+        {"ListView_plzRecord"},
+        {"Panel_fontItem"},
+
+        {"Panel_zzj_statics"},
+        {"Panel_zzj_template"},
     }
 end
 
@@ -56,11 +71,13 @@ function StatisticsLayer:onEnter()
     EventMgr:registListener(EventType.RET_GET_CLUB_STATISTICS_MEMBER,self,self.RET_GET_CLUB_STATISTICS_MEMBER)
     EventMgr:registListener(EventType.RET_GET_CLUB_STATISTICS_MEMBER_FINISH,self,self.RET_GET_CLUB_STATISTICS_MEMBER_FINISH)
     EventMgr:registListener(EventType.RET_GET_CLUB_STATISTICS,self,self.RET_GET_CLUB_STATISTICS)
-    
     EventMgr:registListener(EventType.RET_GET_CLUB_STATISTICS_FINISH,self,self.RET_GET_CLUB_STATISTICS_FINISH)
-    
     EventMgr:registListener(EventType.RET_GET_CLUB_STATISTICS_MYSELF_FINISH,self,self.RET_GET_CLUB_STATISTICS_MYSELF_FINISH)
-    
+    EventMgr:registListener(EventType.RET_GET_CLUB_FATIGUE_STATISTICS,self,self.RET_GET_CLUB_FATIGUE_STATISTICS)
+    EventMgr:registListener(EventType.RET_GET_CLUB_FATIGUE_DETAILS,self,self.RET_GET_CLUB_FATIGUE_DETAILS)
+    EventMgr:registListener(EventType.RET_GET_GAME_RECORD,self,self.RET_GET_GAME_RECORD)   
+    EventMgr:registListener(EventType.RET_GET_GAME_RECORD_FINISH,self,self.RET_GET_GAME_RECORD_FINISH)
+    EventMgr:registListener(EventType.RET_LIKE_GAME_RECORD,self,self.RET_LIKE_GAME_RECORD) 
 end
 
 function StatisticsLayer:onExit()
@@ -70,8 +87,12 @@ function StatisticsLayer:onExit()
     EventMgr:unregistListener(EventType.RET_GET_CLUB_STATISTICS_MEMBER_FINISH,self,self.RET_GET_CLUB_STATISTICS_MEMBER_FINISH)
     EventMgr:unregistListener(EventType.RET_GET_CLUB_STATISTICS,self,self.RET_GET_CLUB_STATISTICS)
     EventMgr:unregistListener(EventType.RET_GET_CLUB_STATISTICS_FINISH,self,self.RET_GET_CLUB_STATISTICS_FINISH)
-
     EventMgr:unregistListener(EventType.RET_GET_CLUB_STATISTICS_MYSELF_FINISH,self,self.RET_GET_CLUB_STATISTICS_MYSELF_FINISH)
+    EventMgr:unregistListener(EventType.RET_GET_CLUB_FATIGUE_STATISTICS,self,self.RET_GET_CLUB_FATIGUE_STATISTICS)
+    EventMgr:unregistListener(EventType.RET_GET_CLUB_FATIGUE_DETAILS,self,self.RET_GET_CLUB_FATIGUE_DETAILS)
+    EventMgr:unregistListener(EventType.RET_GET_GAME_RECORD,self,self.RET_GET_GAME_RECORD)
+    EventMgr:unregistListener(EventType.RET_GET_GAME_RECORD_FINISH,self,self.RET_GET_GAME_RECORD_FINISH)
+    EventMgr:unregistListener(EventType.RET_LIKE_GAME_RECORD,self,self.RET_LIKE_GAME_RECORD)  
 end
 
 function StatisticsLayer:onCreate(params)
@@ -98,15 +119,31 @@ function StatisticsLayer:onCreate(params)
 
     self.reqTotal = false;
 
+    -- 赞战绩 相关参数
+    self.zzj_reqState   = 0 --赞战绩统计状态    
+    self.zzjPage = 0
+    self.data_type = -1
+    self.data_dwUserID = 0
+
     self:updateToday(self.stamp)  
     self:initUI()
-    self:createToggleButton(2,'Button_player_',handler(self,self.onClickToggleRecord),1)
+    self:createToggleButton(4,'Button_player_',handler(self,self.onClickToggleRecord),1)
     --注册子节点按钮事件
     self:createToggleButton(4,'Button_child',handler(self,self.onClickChildToggle),-1)
     --注册子button panel
     self:registerButtonPanel('ListView_child_1',STAITSTICS.PLAY_STATICS)
     self:checkPanel()
     self:updateButtonLayout(STAITSTICS.PLAY_STATICS)
+
+    local callback = function()
+        self.Image_recordFrame:setVisible(false)
+    end
+    Common:registerScriptMask(self.Image_recordFrame, callback)
+
+    self.ListView_plzRecord:addScrollViewEventListener(handler(self, self.listViewPlzRecordEventListen))
+    self.curPageNum = 1
+    self.pageState = 0
+    self.curUserID = 0
 end
 
 function StatisticsLayer:createToggleButton(perssCount,buttonName,callFunc,defoutCallNum)
@@ -172,6 +209,11 @@ function StatisticsLayer:initUI()
     --玩家统计
     self.play_list = self:seekWidgetByNameEx(self.Panel_player_statics,'ListView_child')
 
+    --赞战绩统计
+    self.zzj_list = self:seekWidgetByNameEx(self.Panel_zzj_statics,'ListView_child')
+    
+    self.zzj_list:addScrollViewEventListener(handler(self, self.zzj_list_event))
+
     self.day_list:addScrollViewEventListener(handler(self, self.day_list_event))
     self.play_list:addScrollViewEventListener(handler(self, self.player_list_event))
     self.Image_left:setSwallowTouches(false)
@@ -222,6 +264,10 @@ function StatisticsLayer:onClickToggleRecord( sender )
         self.pageSate = STAITSTICS.PLAY_STATICS
     elseif name == 'Button_player_2' then
         self.pageSate = STAITSTICS.DAY_STATICS
+    elseif name == 'Button_player_3' then
+        self.pageSate = STAITSTICS.PLZ_STATICS
+    elseif name == 'Button_player_4' then
+        self.pageSate = STAITSTICS.ZZJ_STATICS
     end
     self:updateButtonLayout(self.pageSate)
     self:showPage()
@@ -231,6 +277,13 @@ end
 function StatisticsLayer:showPage()
     self.Panel_player_statics:setVisible(self.pageSate == STAITSTICS.PLAY_STATICS)
     self.Panel_player_day_statics:setVisible(self.pageSate == STAITSTICS.DAY_STATICS)
+    self.Panel_plz_statics:setVisible(self.pageSate == STAITSTICS.PLZ_STATICS)
+    self.Panel_zzj_statics:setVisible(self.pageSate == STAITSTICS.ZZJ_STATICS)
+    if self.Panel_plz_statics:isVisible() then
+        self.Text_bigwimTittle:setVisible(false)
+    else
+        self.Text_bigwimTittle:setVisible(true)
+    end
 end
 
 function StatisticsLayer:checkPanel()
@@ -343,11 +396,11 @@ function StatisticsLayer:getTimeByYMD(year,month,day,isBefore)
 end
 
 function StatisticsLayer:onSearch()
-
-    if self.pageSate == STAITSTICS.DAY_STATICS
-       or self.childPage ~= ChildStatics.None then
+    print('xxxxxxxxxcccccc', self.pageSate, self.childPage, STAITSTICS.PLZ_STATICS)
+    if self.pageSate == STAITSTICS.DAY_STATICS or self.pageSate == STAITSTICS.PLZ_STATICS or self.pageSate == STAITSTICS.ZZJ_STATICS or self.childPage ~= ChildStatics.None then
         if self.searchNum == 0 then
             self.searchNum = 8
+            self.zzjPage = 0
             --查询
             self:research()
             schedule(self.Button_search,function()
@@ -361,7 +414,6 @@ function StatisticsLayer:onSearch()
             require("common.MsgBoxLayer"):create(0,self,self.searchNum .. "秒之后查询")
         end
     end
-
 end
 
 local function isNumber(str )
@@ -370,7 +422,8 @@ end
 
 
 --开始查询
-function StatisticsLayer:research(  )
+function StatisticsLayer:research()
+    print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
     self:resetPlayManager()
     self:resetDayManager()
     --请求各个子页签数据
@@ -398,6 +451,20 @@ function StatisticsLayer:research(  )
     elseif self.pageSate == STAITSTICS.DAY_STATICS then
         self:req_clubStatics() --每日统计
         self:req_statisticsManager()
+    elseif self.pageSate == STAITSTICS.PLZ_STATICS then
+        -- 疲劳值统计
+        local beginTime = self.leftStamp
+        local endTime   = self.rightStamp
+        print('----->>>>',self.clubData.dwClubID, beginTime, endTime)
+        local ListView_child = self.Panel_plz_statics:getChildByName('ListView_child')
+        ListView_child:removeAllItems()
+        UserData.Statistics:req_fatigueStatistics(self.clubData.dwClubID, beginTime, endTime)
+    elseif self.pageSate == STAITSTICS.ZZJ_STATICS then
+        self.zzj_list = self.Panel_zzj_statics:getChildByName('ListView_child')
+        self.zzj_list:removeAllItems()
+        self.data_type = 3
+        self.data_dwUserID = self.clubData.dwUserID
+        self:req_zzjplayer()   
     end
     
 end
@@ -421,6 +488,22 @@ function StatisticsLayer:req_clubStatics()
     local endTime   = self.rightStamp
     UserData.Statistics:req_dayManager(self.clubData.dwClubID, beginTime,endTime,self.clubPage)
 end
+
+function StatisticsLayer:req_zzjplayer( )
+    -- 赞战绩统计
+    local beginTime = self.leftStamp
+    local endTime   = self.rightStamp
+    local textScore = self.TextField_minscore:getString()
+    self.zzjPage = self.zzjPage + 1 
+    print('----->>>>',self.clubData.dwClubID,UserData.User.userID,self.clubData.dwUserID,beginTime, endTime,textScore,self.zzjPage)
+    local ListView_child = self.Panel_plz_statics:getChildByName('ListView_child')
+    ListView_child:removeAllItems()
+
+    --UserData.Statistics:req_getGameRecord(3,self.clubData.dwClubID, self.clubData.dwUserID,beginTime, endTime,textScore,self.zzjPage)
+    if self.data_type ~= -1 then 
+        UserData.Statistics:req_getGameRecord(self.data_type,self.clubData.dwClubID, self.data_dwUserID,beginTime, endTime,textScore,self.zzjPage)  
+    end  
+end 
 
 --每日统计
 function StatisticsLayer:resetDayManager( ... )
@@ -645,6 +728,15 @@ function StatisticsLayer:player_list_event(sender, evenType)
 	end
 end
 
+function StatisticsLayer:zzj_list_event(sender, evenType)
+    if evenType == ccui.ScrollviewEventType.scrollToBottom then
+        if self.zzj_reqState == 1 then
+            self.zzj_reqState = 0
+            self:req_zzjplayer()
+        end
+    end
+end
+
 function StatisticsLayer:leftNodeChange( time,stampMin,stampMax )
     self.Text_day_left:setString(time)
     self.leftStamp = stampMin
@@ -690,6 +782,242 @@ function StatisticsLayer:RET_GET_CLUB_STATISTICS_FINISH(event)
 		self.day_reqState = 1 --本次结束
     end
     self.clubPage = self.clubPage + 1
+end
+
+--赞战绩消息接受结束判断
+function StatisticsLayer:RET_GET_GAME_RECORD_FINISH(event)
+    local data = event._usedata
+    if data.isFinish then
+        self.zzj_reqState = 2 --所有结束
+    else
+        self.zzj_reqState = 1 --本次结束
+    end
+end
+
+function StatisticsLayer:RET_GET_CLUB_FATIGUE_STATISTICS(event)
+    local data = event._usedata
+    Log.d(data)
+    local item = self.Panel_plz_template:clone()
+    local ListView_child = self.Panel_plz_statics:getChildByName('ListView_child')
+    ListView_child:pushBackCustomItem(item)
+    local Text_name = self:seekWidgetByNameEx(item,'Text_name')
+    local Text_id = self:seekWidgetByNameEx(item,'Text_id')
+    local Text_sell_num = self:seekWidgetByNameEx(item,'Text_sell_num')
+    local Button_look = self:seekWidgetByNameEx(item,'Button_look')
+    local Image_avatar = self:seekWidgetByNameEx(item,'Image_avatar')
+    Common:requestUserAvatar(data.dwUserID, data.szLogoInfo, Image_avatar, 'img')
+    SetTextProperty(Text_name,data.szNickName)
+    SetTextProperty(Text_id,data.dwUserID)
+    SetTextProperty(Text_sell_num,data.lFatigue)
+
+    self.Text_all_sell_num:setString(data.lClubSellFatigue)
+    self.Text_all_consume_num:setString(data.lClubConsumeFatigue)
+    self.Text_all_remain_num:setString(data.lSurplusFatigue)
+
+    Common:addTouchEventListener(Button_look,function()
+        --查看
+        self.Image_recordFrame:setVisible(true)
+        self.ListView_plzRecord:removeAllItems()
+        local beginTime = self.leftStamp
+        local endTime   = self.rightStamp
+        self.curUserID = data.dwUserID
+        self.curPageNum = 1
+        UserData.Statistics:getClubFatigueDetatls(self.clubData.dwClubID, self.curUserID, beginTime, endTime, 1)
+    end)
+    
+end
+
+function StatisticsLayer:RET_GET_CLUB_FATIGUE_DETAILS(event)
+    local data = event._usedata
+    Log.d(data)
+    
+    if data.cbType == 5 then
+        --玩家接受买卖疲劳值
+        local item = self.Panel_fontItem:clone()
+        self.ListView_plzRecord:pushBackCustomItem(item)
+        local Text_desfont = ccui.Helper:seekWidgetByName(item, "Text_desfont")
+        Text_desfont:setColor(cc.c3b(165, 61, 9))
+        local timeStr = os.date('%Y年%m月%d日 %H:%M:%S', data.dwOperTime)
+        if data.lFatigue >= 0 then
+            local des = string.format(' 给%s(%d)增加%d,当前剩余%d.', data.szNickName,data.dwUserID,math.abs(data.lFatigue),data.lNewFatigue)
+            Text_desfont:setString(timeStr .. des)
+        else
+            local des = string.format(' 给%s(%d)减少%d,当前剩余%d.', data.szNickName,data.dwUserID,math.abs(data.lFatigue),data.lNewFatigue)
+            Text_desfont:setString(timeStr .. des)
+        end
+        self.ListView_plzRecord:refreshView()
+    end
+
+    -- 当前页是否结束
+    if data.isFinish then
+        if data.isAllFinish then
+            self.pageState = 2
+        else
+            self.pageState = 1
+        end
+        self.curPageNum = self.curPageNum + 1
+    end
+end
+
+function StatisticsLayer:RET_GET_GAME_RECORD(event)
+    local data = event._usedata
+    Log.d(data)
+    local item = self.Panel_zzj_template:clone()
+    item:setName( data.szMainGameID)--'member_' .. 
+    self.zzj_list = self.Panel_zzj_statics:getChildByName('ListView_child')
+    self.zzj_list:pushBackCustomItem(item)
+    local Text_number = self:seekWidgetByNameEx(item,'Text_number')
+    local Text_consumption = self:seekWidgetByNameEx(item,'Text_consumption')
+    local Text_gamename = self:seekWidgetByNameEx(item,'Text_gamename')
+    local Text_num = self:seekWidgetByNameEx(item,'Text_num')
+    local Text_time_1 = self:seekWidgetByNameEx(item,'Text_time_1')
+    local Text_time_2 = self:seekWidgetByNameEx(item,'Text_time_2') 
+    local time  = data.dwStartData + data.dwPlayTimeCount
+    local y,m,d,h,mi,s = Common:getYMDHMS(time)
+   
+    local m0 = ""  
+    local d0 = ""
+    if m < 10 then
+        m0 = "0"
+    end
+    if d < 10 then
+        d0 = "0"
+    end
+
+    local m00 = "" 
+    local s0 = "" 
+    if mi < 10 then
+        m00 = "0"
+    end
+    if s < 10 then
+        s0 = "0"
+    end
+    SetTextProperty(Text_number,data.dwTableID) 
+    SetTextProperty(Text_consumption,'消耗X' ..data.dwRoomCard) 
+    SetTextProperty(Text_gamename,StaticData.Games[data.wKindID].name) 
+    SetTextProperty(Text_num,'('..data.wCurrentGameCount..'/'..data.wGameCount..')') 
+    SetTextProperty(Text_time_1, h..':'..m00..mi..':'..s0..s)
+    SetTextProperty(Text_time_2, y..'/'..m0..m..'/'..d)
+    -- Text_number:setColor(cc.c3b(127, 90, 46))
+    -- Text_consumption:setColor(cc.c3b(127, 90, 46))
+    -- Text_gamename:setColor(cc.c3b(127, 90, 46))
+    -- Text_num:setColor(cc.c3b(127, 90, 46))
+    -- Text_time_1:setColor(cc.c3b(127, 90, 46))
+    -- Text_time_2:setColor(cc.c3b(127, 90, 46))
+    local User = {} 
+    local num = 0
+    for i =1 , 4 do 
+        if data.tUser[i].szNickName ~='' and data.tUser[i].lScore ~=538976288 then  
+            if data.tUser[i].bBigWinner == 1 then  
+                num = num + 1
+                User[num] = data.tUser[i]
+            end    
+        end 
+    end 
+
+    for i =1 , 4 do 
+        if data.tUser[i].szNickName ~='' and data.tUser[i].lScore ~=538976288 then  
+            if data.tUser[i].bBigWinner == 0 then 
+                num = num + 1
+                User[num] = data.tUser[i]
+            end    
+        end 
+    end 
+    for i =1 , 4 do 
+        local Text_Gamename = self:seekWidgetByNameEx(item,'Text_name_'.. i)      
+        if num >= i then 
+            local name = Common:getShortName(User[i].szNickName,8,8)
+            SetTextProperty(Text_Gamename,name..':'..User[i].lScore) --
+            --Text_Gamename:setColor(cc.c3b(127, 90, 46))
+            if User[i].bBigWinner == 1 then 
+                Text_Gamename:setColor(cc.c3b(255, 0, 0))
+            end 
+        else
+            SetTextProperty(Text_Gamename,"") 
+        end 
+
+        -- if data.tUser[i].szNickName ~='' and data.tUser[i].lScore ~=538976288 then 
+        --     local name = Common:getShortName(data.tUser[i].szNickName,8,8)
+        --     SetTextProperty(Text_Gamename,name..':'..data.tUser[i].lScore) --
+        --     --Text_Gamename:setColor(cc.c3b(127, 90, 46))
+        -- else
+        --     SetTextProperty(Text_Gamename,"") 
+        -- end 
+    end
+
+    local Button_zan = self:seekWidgetByNameEx(item,'Button_zan')
+    local Image_zan = self:seekWidgetByNameEx(item,'Image_zan')
+    Common:addTouchEventListener(Button_zan,function()
+        --点赞
+
+        -- DWORD    dwAdministratorID;              //管理员
+        -- TCHAR    szSignID[32];                   //战绩唯一标志
+        UserData.Statistics:req_likeGameRecord(UserData.User.userID,data.szMainGameID)
+    end)
+
+    if data.dwLike ~= 0 then
+        Button_zan:setBright(false)
+        Button_zan:setEnabled(false)
+        Button_zan:setVisible(false)
+        Image_zan:setVisible(true)
+    else
+        Button_zan:setBright(true)
+        Button_zan:setEnabled(true)
+        Button_zan:setVisible(true)
+        Image_zan:setVisible(false)
+    end
+end 
+function StatisticsLayer:RET_LIKE_GAME_RECORD(event)
+    local data = event._usedata
+    Log.d(data)
+    if data.lRet == 1 then
+        require("common.MsgBoxLayer"):create(0,self,"查询无该俱乐部!")
+        return
+    elseif data.lRet == 2 then
+        require("common.MsgBoxLayer"):create(0,self,"该俱乐部点赞已点击!")
+        return
+    elseif data.lRet == 3 then
+        require("common.MsgBoxLayer"):create(0,self,"点赞玩家非群主、管理员!")
+        return
+    end
+    require("common.MsgBoxLayer"):create(0,self,"点赞成功!")
+    -- local ListView_child = self.Panel_zzj_statics:getChildByName('ListView_child')
+    local item = self.zzj_list:getChildByName(data.szSignID)--'member_' .. 
+    print("++++++>>>>>>",data.szSignID)
+    self:setMemberMgrFlag(item, data)
+end 
+
+function StatisticsLayer:listViewPlzRecordEventListen(sender, evenType)
+    if evenType == ccui.ScrollviewEventType.scrollToBottom then
+        print('--------scrollToBottom-------', self.curPageNum, self.pageState)
+        if self.pageState == 1 then
+            self.pageState = 0
+            local beginTime = self.leftStamp
+            local endTime   = self.rightStamp
+            UserData.Statistics:getClubFatigueDetatls(self.clubData.dwClubID, self.curUserID, beginTime, endTime, self.curPageNum)
+        end
+    end
+end
+
+--设置成员不同权限标识
+function StatisticsLayer:setMemberMgrFlag(item, data)
+    if not (item and data) then
+        return
+    end
+    local Button_zan = self:seekWidgetByNameEx(item, "Button_zan")
+    local Image_zan = self:seekWidgetByNameEx(item, "Image_zan")
+    if data.lRet == 0 then
+        Button_zan:setBright(false)
+        Button_zan:setEnabled(false)
+        Button_zan:setVisible(false)
+        Image_zan:setVisible(true)
+    else
+        Button_zan:setBright(true)
+        Button_zan:setEnabled(true)
+        Button_zan:setVisible(true)
+        Image_zan:setVisible(false)
+    end
+
 end
 
 return StatisticsLayer

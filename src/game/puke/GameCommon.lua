@@ -184,14 +184,20 @@ function GameCommon:playAnimation(root,id, wChairID)
     if AnimationData == nil then
         return
     end
+
+
+
     if AnimationData.animFile ~= "" then
         if id == "报警" then
             local viewID = GameCommon:getViewIDByChairID(wChairID)
             local uiPanel_player = ccui.Helper:seekWidgetByName(root,string.format("Panel_player%d",viewID))
             local uiPanel_playerInfo = ccui.Helper:seekWidgetByName(uiPanel_player,"Panel_playerInfo")
             local visibleSize = cc.Director:getInstance():getVisibleSize()
-            ccs.ArmatureDataManager:getInstance():addArmatureFileInfo(AnimationData.animFile)
-            local armature = ccs.Armature:create(AnimationData.animName)
+
+            local armature = ccui.ImageView:create(AnimationData.png)
+
+            -- ccs.ArmatureDataManager:getInstance():addArmatureFileInfo(AnimationData.animFile)
+            -- local armature = ccs.Armature:create(AnimationData.animName)
             uiPanel_playerInfo:addChild(armature)
             armature:setPosition(cc.p(armature:getParent():convertToNodeSpace(cc.p(visibleSize.width/2,visibleSize.height/2))))
             local pt = cc.p(uiPanel_playerInfo:getContentSize().width + 0,uiPanel_playerInfo:getContentSize().height/2)
@@ -199,7 +205,7 @@ function GameCommon:playAnimation(root,id, wChairID)
                 pt = cc.p(-0,uiPanel_playerInfo:getContentSize().height/2)
             end
             armature:setScale(1.5)
-            armature:getAnimation():playWithIndex(0,-1,1)
+            -- armature:getAnimation():playWithIndex(0,-1,1)
             armature:runAction(cc.Spawn:create(
                 cc.ScaleTo:create(0.5,0.5),
                 cc.MoveTo:create(0.5,pt)
@@ -207,25 +213,48 @@ function GameCommon:playAnimation(root,id, wChairID)
         else
             local visibleSize = cc.Director:getInstance():getVisibleSize()
             local uiPanel_tipsCard = ccui.Helper:seekWidgetByName(root,"Panel_tipsCard")
-            ccs.ArmatureDataManager:getInstance():addArmatureFileInfo(AnimationData.animFile)
-            local armature = ccs.Armature:create(AnimationData.animName)
-            uiPanel_tipsCard:addChild(armature)
-            armature:setScale(1.5)
-            armature:getAnimation():playWithIndex(0,-1,0)
+
+            local armature = ccui.ImageView:create(AnimationData.png)
+
+            -- ccs.ArmatureDataManager:getInstance():addArmatureFileInfo(AnimationData.animFile)
+            -- local armature = ccs.Armature:create(AnimationData.animName)
+            uiPanel_tipsCard:addChild(armature)   
+
+            local viewID = GameCommon:getViewIDByChairID(wChairID)
+            local uiPanel_tipsCardPosUser = ccui.Helper:seekWidgetByName(root,string.format("Panel_tipsCardPos%d",viewID))    
+
+            armature:setPosition(cc.p(uiPanel_tipsCardPosUser:getPositionX()-50,uiPanel_tipsCardPosUser:getPositionY()))    
+            -- armature:getAnimation():playWithIndex(0,-1,0)
             if GameCommon.tableConfig.wKindID == 51 or GameCommon.tableConfig.wKindID == 53 or GameCommon.tableConfig.wKindID == 55 or GameCommon.tableConfig.wKindID == 56 or GameCommon.tableConfig.wKindID == 57 or GameCommon.tableConfig.wKindID == 58 or GameCommon.tableConfig.wKindID == 59 then
+                if viewID ~= 1 then 
+                    armature:setScale(0.7)
+                end 
+
                 armature:runAction(cc.Sequence:create(
-                    cc.DelayTime:create(1.0),
-                    cc.ScaleTo:create(0.2,0.8)))
-            else
+                    cc.MoveTo:create(0.2,cc.p(uiPanel_tipsCardPosUser:getPositionX()+20,uiPanel_tipsCardPosUser:getPositionY())),
+                    cc.MoveTo:create(0.1,cc.p(uiPanel_tipsCardPosUser:getPositionX()-20,uiPanel_tipsCardPosUser:getPositionY())),
+                    cc.MoveTo:create(0.1,cc.p(uiPanel_tipsCardPosUser:getPositionX()+20,uiPanel_tipsCardPosUser:getPositionY())),
+                    cc.MoveTo:create(0.1,cc.p(uiPanel_tipsCardPosUser:getPositionX(),uiPanel_tipsCardPosUser:getPositionY()))
+
+                ))
+                   
+                
+                -- cc.Sequence:create(
+                --     -- cc.DelayTime:create(1.0),
+                --     -- cc.ScaleTo:create(0.2,0.8)             
+                -- ))
+            else              
+                armature:setPosition(uiPanel_tipsCardPosUser:getPosition())
+                armature:setScale(1.5)
                 armature:runAction(cc.Sequence:create(
                     cc.ScaleTo:create(0.1,1),
                     cc.DelayTime:create(1.0),
                     cc.FadeOut:create(0.5),
                     cc.RemoveSelf:create()))
+
+  
             end
-            local viewID = GameCommon:getViewIDByChairID(wChairID)
-            local uiPanel_tipsCardPosUser = ccui.Helper:seekWidgetByName(root,string.format("Panel_tipsCardPos%d",viewID))
-            armature:setPosition(uiPanel_tipsCardPosUser:getPosition())
+            -- armature:setPosition(uiPanel_tipsCardPosUser:getPosition())
         end
 
     end

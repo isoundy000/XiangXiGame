@@ -194,16 +194,21 @@ function RoomCreateLayer:SUB_CL_FRIENDROOM_CONFIG_END(event)
         local data = self.tableFriendsRoomParams[key]
     	if data then
             local uiText_desc = ccui.Helper:seekWidgetByName(var,"Text_desc")
-            uiText_desc:setString(string.format("%d局",data.wGameCount))
+            --    uiText_desc:setString(string.format("%d局",data.wGameCount))
             local uiText_addition = ccui.Helper:seekWidgetByName(var,"Text_addition")
+            uiText_addition:setVisible(false)
             if data.dwExpendType == 1 then
                 uiText_addition:setString(string.format("金币x%d",data.dwExpendCount))
+                uiText_desc:setString(string.format("%d局 金币x%d",data.wGameCount,data.dwExpendCount))
             elseif data.dwExpendType == 2 then
                 uiText_addition:setString(string.format("元宝x%d",data.dwExpendCount))
+                uiText_desc:setString(string.format("%d局 元宝x%d",data.wGameCount,data.dwExpendCount))
             elseif data.dwExpendType == 3 then
-                uiText_addition:setString(string.format("(%sx%d)",StaticData.Items[data.dwSubType].name,data.dwExpendCount)) 
+                uiText_addition:setString(string.format("(%sx%d)",StaticData.Items[data.dwSubType].name,data.dwExpendCount))
+                uiText_desc:setString(string.format("%d局(%sx%d)",data.wGameCount,StaticData.Items[data.dwSubType].name,data.dwExpendCount))
             else
                 uiText_addition:setString("(无消耗)")
+                uiText_desc:setString(string.format("%d局(无消耗)",data.wGameCount))
             end
             if isFound == false and self.recordCreateParameter["wGameCount"] ~= nil and self.recordCreateParameter["wGameCount"] == data.wGameCount then
                 var:setBright(true)

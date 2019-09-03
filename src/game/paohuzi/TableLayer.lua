@@ -2804,18 +2804,24 @@ function TableLayer:playSkelStartToEndPos(sChairID, eChairID, index)
                 if v.wChairID ~= sChairID then
                     local spos = self:getViewWorldPosByChairID(sChairID)
                     local epos = self:getViewWorldPosByChairID(v.wChairID)
-                    local rotation = -math.atan((epos.y - spos.y)/ (epos.x - spos.x)) * 57.3
+                    local rotation = math.atan((epos.y - spos.y)/ (epos.x - spos.x)) * 57.3
                     print('rotation =11>>>>>>>> ', rotation)
-                    if GameCommon.meChairID ~= sChairID then
-                        if rotation < 0 then
-                            rotation = rotation + 180
-                        else
-                            local viewid = GameCommon:getViewIDByChairID(v.wChairID)
-                            print('点自己发送:',viewid)
-                            if viewid == 2 then
-                                rotation = rotation + 180
-                            end
-                        end
+                    -- if GameCommon.meChairID ~= sChairID then
+                    --     if rotation < 0 then
+                    --         rotation = rotation + 180
+                    --     else
+                    --         local viewid = GameCommon:getViewIDByChairID(v.wChairID)
+                    --         print('点自己发送:',viewid)
+                    --         if viewid == 2 then
+                    --             rotation = rotation + 180
+                    --         end
+                    --     end
+                    -- end
+
+                    local viewid = GameCommon:getViewIDByChairID(v.wChairID)
+                    print('点对应头像发送:',viewid)
+                    if viewid == 3 then
+                        rotation = -rotation
                     end
                     self:playSketlAnim(v.wChairID, v.wChairID, 9, v.wChairID)
                     self:playOneAnim(sChairID, sChairID, 1, '_'..v.wChairID, rotation)
@@ -2828,21 +2834,29 @@ function TableLayer:playSkelStartToEndPos(sChairID, eChairID, index)
             local epos = self:getViewWorldPosByChairID(eChairID)
             local rotation = math.atan((epos.y - spos.y)/ (epos.x - spos.x)) * 57.3
             print('rotation =22<<<<<<<< ', rotation)
-            if GameCommon.meChairID ~= sChairID then
-                if rotation > 0 then
-                    rotation = -(rotation + 180)
-                else
+            -- if GameCommon.meChairID ~= sChairID then
+            --     if rotation > 0 then
+            --         rotation = -(rotation + 180)
+            --     else
+            --         local viewid = GameCommon:getViewIDByChairID(eChairID)
+            --         print('点对应头像发送:',viewid)
+            --         if viewid == 4 then
+            --             rotation = -rotation
+            --         else
+            --             rotation = 180 - rotation
+            --         end
+            --     end
+            -- else
+
                     local viewid = GameCommon:getViewIDByChairID(eChairID)
                     print('点对应头像发送:',viewid)
-                    if viewid == 4 then
+                    if viewid == 3 then
                         rotation = -rotation
-                    else
-                        rotation = 180 - rotation
                     end
-                end
-            else
-                rotation = -rotation
-            end
+
+
+               -- rotation = -rotation
+            -- end
             self:playSketlAnim(eChairID, eChairID, 9, eChairID)
             self:playOneAnim(sChairID, sChairID, 1, '_'..eChairID,rotation)
         end

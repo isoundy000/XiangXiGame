@@ -298,13 +298,18 @@ function GameEndLayer:onCreate(pBuffer)
 
         local uiImage_winType = ccui.Helper:seekWidgetByName(item,"Image_winType")
         if pBuffer.wProvideUser < GameCommon.gameConfig.bPlayerCount then
+
+            print("借货损信息++++++++++++++",pBuffer.wProvideUser,wChairID,i,pBuffer.wWinner[i],GameCommon.gameConfig.bJiePao)
             if pBuffer.wProvideUser == wChairID and pBuffer.wWinner[i] == true then
                 local textureName = "majiang/table/end_zimo.png"
                 local texture = cc.Director:getInstance():getTextureCache():addImage(textureName)
                 uiImage_winType:loadTexture(textureName)
                 uiImage_winType:setContentSize(texture:getContentSizeInPixels())
-            elseif pBuffer.wWinner[i] == true then
-                local textureName = "majiang/table/end_hupai.png"
+            elseif pBuffer.wProvideUser ~= wChairID and pBuffer.wWinner[i] == true then
+                local textureName = "majiang/table/end_hupai.png"   
+                if GameCommon.gameConfig.bJiePao == 0 then 
+                    textureName = "majiang/table/end_qgh.png"
+                end           
                 local texture = cc.Director:getInstance():getTextureCache():addImage(textureName)
                 uiImage_winType:loadTexture(textureName)
                 uiImage_winType:setContentSize(texture:getContentSizeInPixels())

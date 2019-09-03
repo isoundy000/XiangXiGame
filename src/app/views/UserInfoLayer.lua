@@ -74,8 +74,9 @@ function UserInfoLayer:onCreate(parames)
     --兑换
     local uiButton_money = ccui.Helper:seekWidgetByName(self.root,"Button_money")
     if  uiButton_money ~= nil then
-        Common:addTouchEventListener(uiButton_money,function()             
-            require("common.SceneMgr"):switchOperation(require("app.MyApp"):create(3):createView("NewXXMallLayer")) 
+        Common:addTouchEventListener(uiButton_money,function()    
+            require("common.SceneMgr"):switchOperation(require("app.MyApp"):create():createView("ExchangeCenterLayer"))         
+            --require("common.SceneMgr"):switchOperation(require("app.MyApp"):create(3):createView("NewXXMallLayer")) 
         end)    
     end
 

@@ -223,19 +223,34 @@ function RoomCreateLayer:onCreate(parameter)
     Common:addCheckTouchEventListener(uiListView_parameter2:getItems(),true)
     local uiListView_parameter3 = ccui.Helper:seekWidgetByName(uiPanel_xuanXiang,"ListView_parameter3")
     Common:addCheckTouchEventListener(uiListView_parameter3:getItems(),true)
+    local uiListView_parameter4 = ccui.Helper:seekWidgetByName(uiPanel_xuanXiang,"ListView_parameter4")
+    Common:addCheckTouchEventListener(uiListView_parameter4:getItems(),true)
+    local uiListView_parameter5 = ccui.Helper:seekWidgetByName(uiPanel_xuanXiang,"ListView_parameter5")
+    Common:addCheckTouchEventListener(uiListView_parameter5:getItems(),true)
+    local uiListView_parameter6 = ccui.Helper:seekWidgetByName(uiPanel_xuanXiang,"ListView_parameter6")
+    Common:addCheckTouchEventListener(uiListView_parameter6:getItems(),true)
     Common:addCheckTouchEventListener(items,false, function(index)
     	if index == 1 then
     	    uiListView_parameter1:setVisible(true)
             uiListView_parameter2:setVisible(true)
-            uiListView_parameter3:setVisible(false)
+            uiListView_parameter3:setVisible(true)
+            uiListView_parameter4:setVisible(true)
+            uiListView_parameter5:setVisible(false)
+            uiListView_parameter6:setVisible(false)
     	elseif index == 2 then
             uiListView_parameter1:setVisible(false)
             uiListView_parameter2:setVisible(false)
-            uiListView_parameter3:setVisible(true)
+            uiListView_parameter3:setVisible(false)
+            uiListView_parameter4:setVisible(false)
+            uiListView_parameter5:setVisible(true)
+            uiListView_parameter6:setVisible(true)
     	else
             uiListView_parameter1:setVisible(false)
             uiListView_parameter2:setVisible(false)
             uiListView_parameter3:setVisible(false)
+            uiListView_parameter4:setVisible(false)
+            uiListView_parameter5:setVisible(false)
+            uiListView_parameter6:setVisible(false)
     	end
     end)
     
@@ -265,6 +280,7 @@ function RoomCreateLayer:onCreate(parameter)
     self.MingTang_Shun                   =0x00400000
     self.MingTang_ShuaHou                =0x00800000
     self.MingTang_ZhuoXiaoSan            =0x01000000
+    self.MingTang_HuangFan				 =0x02000000
     self.MingTang_Max                    =0x80000000
     if self.recordCreateParameter["bMingType"] ~= nil and self.recordCreateParameter["bMingType"] == 0 then
         items[3]:setBright(true)
@@ -275,6 +291,9 @@ function RoomCreateLayer:onCreate(parameter)
         uiListView_parameter1:setVisible(false)
         uiListView_parameter2:setVisible(false)
         uiListView_parameter3:setVisible(false)
+        uiListView_parameter4:setVisible(false)
+        uiListView_parameter5:setVisible(false)
+        uiListView_parameter6:setVisible(false)
     elseif self.recordCreateParameter["bMingType"] ~= nil and self.recordCreateParameter["bMingType"] == 1 then
         items[2]:setBright(true)
         local uiText_desc = ccui.Helper:seekWidgetByName(items[2],"Text_desc")
@@ -283,23 +302,64 @@ function RoomCreateLayer:onCreate(parameter)
         end 
         uiListView_parameter1:setVisible(false)
         uiListView_parameter2:setVisible(false)
-        uiListView_parameter3:setVisible(true)
+        uiListView_parameter3:setVisible(false)
+        uiListView_parameter4:setVisible(false)
+        uiListView_parameter5:setVisible(true)
+        uiListView_parameter6:setVisible(true)
         if self.recordCreateParameter["dwMingTang"] ~= nil then
-            local items3 = uiListView_parameter3:getItems()
+            local items5 = uiListView_parameter5:getItems()
             if Bit:_and(self.MingTang_Yin,self.recordCreateParameter["dwMingTang"]) ~= 0 then
-                items3[1]:setBright(true)
-                local uiText_desc = ccui.Helper:seekWidgetByName(items3[1],"Text_desc")
+                items5[1]:setBright(true)
+                local uiText_desc = ccui.Helper:seekWidgetByName(items5[1],"Text_desc")
                 if uiText_desc ~= nil then 
                     uiText_desc:setTextColor(cc.c3b(215,86,31))
                 end 
             end
             if Bit:_and(self.MingTang_ZhenHangHangXing,self.recordCreateParameter["dwMingTang"]) ~= 0 then
-                items3[2]:setBright(true)
-                local uiText_desc = ccui.Helper:seekWidgetByName(items3[2],"Text_desc")
+                items5[2]:setBright(true)
+                local uiText_desc = ccui.Helper:seekWidgetByName(items5[2],"Text_desc")
                 if uiText_desc ~= nil then 
                     uiText_desc:setTextColor(cc.c3b(215,86,31))
                 end 
             end
+            if Bit:_and(self.MingTang_ShuaHou,self.recordCreateParameter["dwMingTang"]) ~= 0 then
+                items5[3]:setBright(true)
+                local uiText_desc = ccui.Helper:seekWidgetByName(items5[3],"Text_desc")
+                if uiText_desc ~= nil then 
+                    uiText_desc:setTextColor(cc.c3b(215,86,31))
+                end 
+            end
+            if Bit:_and(self.MingTang_HaiDiHu,self.recordCreateParameter["dwMingTang"]) ~= 0 then
+                items5[4]:setBright(true)
+                local uiText_desc = ccui.Helper:seekWidgetByName(items5[4],"Text_desc")
+                if uiText_desc ~= nil then 
+                    uiText_desc:setTextColor(cc.c3b(215,86,31))
+                end 
+            end
+
+            local items6 = uiListView_parameter6:getItems()
+            if Bit:_and(self.MingTang_TingHu,self.recordCreateParameter["dwMingTang"]) ~= 0 then
+                items6[1]:setBright(true)
+                local uiText_desc = ccui.Helper:seekWidgetByName(items6[1],"Text_desc")
+                if uiText_desc ~= nil then 
+                    uiText_desc:setTextColor(cc.c3b(215,86,31))
+                end 
+            end
+            if Bit:_and(self.MingTang_HuangFan,self.recordCreateParameter["dwMingTang"]) ~= 0 then
+                items6[2]:setBright(true)
+                local uiText_desc = ccui.Helper:seekWidgetByName(items6[2],"Text_desc")
+                if uiText_desc ~= nil then 
+                    uiText_desc:setTextColor(cc.c3b(215,86,31))
+                end 
+            end
+            if Bit:_and(self.MingTang_ZhuoXiaoSan,self.recordCreateParameter["dwMingTang"]) ~= 0 then
+                items6[3]:setBright(true)
+                local uiText_desc = ccui.Helper:seekWidgetByName(items6[3],"Text_desc")
+                if uiText_desc ~= nil then 
+                    uiText_desc:setTextColor(cc.c3b(215,86,31))
+                end 
+            end
+
         end
     else
         items[1]:setBright(true)
@@ -309,7 +369,10 @@ function RoomCreateLayer:onCreate(parameter)
         end 
         uiListView_parameter1:setVisible(true)
         uiListView_parameter2:setVisible(true)
-        uiListView_parameter3:setVisible(false)
+        uiListView_parameter3:setVisible(true)
+        uiListView_parameter4:setVisible(true)
+        uiListView_parameter5:setVisible(false)
+        uiListView_parameter6:setVisible(false)
         if self.recordCreateParameter["dwMingTang"] ~= nil then
             local items1 = uiListView_parameter1:getItems()
             if Bit:_and(self.MingTang_Yin,self.recordCreateParameter["dwMingTang"]) ~= 0 then
@@ -369,9 +432,82 @@ function RoomCreateLayer:onCreate(parameter)
                     uiText_desc:setTextColor(cc.c3b(215,86,31))
                 end 
             end
+
+            local items3 = uiListView_parameter3:getItems()
+            if Bit:_and(self.MingTang_ShuaHou,self.recordCreateParameter["dwMingTang"]) ~= 0 then
+                items3[1]:setBright(true)
+                local uiText_desc = ccui.Helper:seekWidgetByName(items3[1],"Text_desc")
+                if uiText_desc ~= nil then 
+                    uiText_desc:setTextColor(cc.c3b(215,86,31))
+                end 
+            end
+            if Bit:_and(self.MingTang_HaiDiHu,self.recordCreateParameter["dwMingTang"]) ~= 0 then
+                items3[2]:setBright(true)
+                local uiText_desc = ccui.Helper:seekWidgetByName(items3[2],"Text_desc")
+                if uiText_desc ~= nil then 
+                    uiText_desc:setTextColor(cc.c3b(215,86,31))
+                end 
+            end
+            if Bit:_and(self.MingTang_TingHu,self.recordCreateParameter["dwMingTang"]) ~= 0 then
+                items3[3]:setBright(true)
+                local uiText_desc = ccui.Helper:seekWidgetByName(items3[3],"Text_desc")
+                if uiText_desc ~= nil then 
+                    uiText_desc:setTextColor(cc.c3b(215,86,31))
+                end 
+            end
+            if Bit:_and(self.MingTang_HuangFan,self.recordCreateParameter["dwMingTang"]) ~= 0 then
+                items3[4]:setBright(true)
+                local uiText_desc = ccui.Helper:seekWidgetByName(items3[4],"Text_desc")
+                if uiText_desc ~= nil then 
+                    uiText_desc:setTextColor(cc.c3b(215,86,31))
+                end 
+            end
+            local items4 = uiListView_parameter4:getItems()
+            if Bit:_and(self.MingTang_ZhuoXiaoSan,self.recordCreateParameter["dwMingTang"]) ~= 0 then
+                items4[1]:setBright(true)
+                local uiText_desc = ccui.Helper:seekWidgetByName(items4[1],"Text_desc")
+                if uiText_desc ~= nil then 
+                    uiText_desc:setTextColor(cc.c3b(215,86,31))
+                end 
+            end
         end
     end
-    
+
+    --选择托管时间
+    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(7),"ListView_parameter"):getItems()
+    Common:addCheckTouchEventListener(items)
+    if self.recordCreateParameter["bHostedTime"] ~= nil and self.recordCreateParameter["bHostedTime"] == 1 then
+        items[2]:setBright(true)
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[2],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(215,86,31))
+        end 
+    elseif self.recordCreateParameter["bHostedTime"] ~= nil and self.recordCreateParameter["bHostedTime"] == 2 then
+        items[3]:setBright(true)
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[3],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(215,86,31))
+        end 
+    elseif self.recordCreateParameter["bHostedTime"] ~= nil and self.recordCreateParameter["bHostedTime"] == 3 then
+        items[4]:setBright(true)
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[3],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(215,86,31))
+        end 
+    elseif self.recordCreateParameter["bHostedTime"] ~= nil and self.recordCreateParameter["bHostedTime"] == 5 then
+        items[5]:setBright(true)
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[3],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(215,86,31))
+        end 
+    else
+        items[1]:setBright(true)
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[1],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(215,86,31))
+        end 
+    end
+
     if self.showType == 3 then
         self.tableFriendsRoomParams = {[1] = {wGameCount = 1}}
         self:SUB_CL_FRIENDROOM_CONFIG_END()
@@ -404,16 +540,21 @@ function RoomCreateLayer:SUB_CL_FRIENDROOM_CONFIG_END(event)
         local data = self.tableFriendsRoomParams[key]
     	if data then
             local uiText_desc = ccui.Helper:seekWidgetByName(var,"Text_desc")
-            uiText_desc:setString(string.format("%d局",data.wGameCount))
+            --    uiText_desc:setString(string.format("%d局",data.wGameCount))
             local uiText_addition = ccui.Helper:seekWidgetByName(var,"Text_addition")
+            uiText_addition:setVisible(false)
             if data.dwExpendType == 1 then
                 uiText_addition:setString(string.format("金币x%d",data.dwExpendCount))
+                uiText_desc:setString(string.format("%d局 金币x%d",data.wGameCount,data.dwExpendCount))
             elseif data.dwExpendType == 2 then
                 uiText_addition:setString(string.format("元宝x%d",data.dwExpendCount))
+                uiText_desc:setString(string.format("%d局 元宝x%d",data.wGameCount,data.dwExpendCount))
             elseif data.dwExpendType == 3 then
-                uiText_addition:setString(string.format("(%sx%d)",StaticData.Items[data.dwSubType].name,data.dwExpendCount)) 
+                uiText_addition:setString(string.format("(%sx%d)",StaticData.Items[data.dwSubType].name,data.dwExpendCount))
+                uiText_desc:setString(string.format("%d局(%sx%d)",data.wGameCount,StaticData.Items[data.dwSubType].name,data.dwExpendCount))
             else
                 uiText_addition:setString("(无消耗)")
+                uiText_desc:setString(string.format("%d局(无消耗)",data.wGameCount))
             end
             if isFound == false and self.recordCreateParameter["wGameCount"] ~= nil and self.recordCreateParameter["wGameCount"] == data.wGameCount then
                 var:setBright(true)
@@ -521,6 +662,9 @@ function RoomCreateLayer:onEventCreate(nTableType)
     local uiListView_parameter1 = ccui.Helper:seekWidgetByName(uiPanel_xuanXiang,"ListView_parameter1")
     local uiListView_parameter2 = ccui.Helper:seekWidgetByName(uiPanel_xuanXiang,"ListView_parameter2")
     local uiListView_parameter3 = ccui.Helper:seekWidgetByName(uiPanel_xuanXiang,"ListView_parameter3")
+    local uiListView_parameter4 = ccui.Helper:seekWidgetByName(uiPanel_xuanXiang,"ListView_parameter4")
+    local uiListView_parameter5 = ccui.Helper:seekWidgetByName(uiPanel_xuanXiang,"ListView_parameter5")
+    local uiListView_parameter6 = ccui.Helper:seekWidgetByName(uiPanel_xuanXiang,"ListView_parameter6")
     if items[1]:isBright() then
         tableParameter.bMingType = 2
         local items1 = uiListView_parameter1:getItems()
@@ -553,6 +697,24 @@ function RoomCreateLayer:onEventCreate(nTableType)
         if items2[4]:isBright() then
             tableParameter.dwMingTang = Bit:_or(tableParameter.dwMingTang,self.MingTang_Gai)
         end
+
+        local items3 = uiListView_parameter3:getItems()
+        if items3[1]:isBright() then
+            tableParameter.dwMingTang = Bit:_or(tableParameter.dwMingTang,self.MingTang_ShuaHou)
+        end
+        if items3[2]:isBright() then
+            tableParameter.dwMingTang = Bit:_or(tableParameter.dwMingTang,self.MingTang_HaiDiHu)
+        end
+        if items3[3]:isBright() then
+            tableParameter.dwMingTang = Bit:_or(tableParameter.dwMingTang,self.MingTang_TingHu)
+        end
+        if items3[4]:isBright() then
+            tableParameter.dwMingTang = Bit:_or(tableParameter.dwMingTang,self.MingTang_HuangFan)
+        end
+        local items4 = uiListView_parameter4:getItems()
+        if items4[1]:isBright() then
+            tableParameter.dwMingTang = Bit:_or(tableParameter.dwMingTang,self.MingTang_ZhuoXiaoSan)
+        end
         tableParameter.dwMingTang = Bit:_or(tableParameter.dwMingTang,self.MingTang_ZiMo)
         tableParameter.dwMingTang = Bit:_or(tableParameter.dwMingTang,self.MingTang_HongHu)
         tableParameter.dwMingTang = Bit:_or(tableParameter.dwMingTang,self.MingTang_HeiHu)
@@ -562,20 +724,40 @@ function RoomCreateLayer:onEventCreate(nTableType)
         tableParameter.dwMingTang = Bit:_or(tableParameter.dwMingTang,self.MingTang_DuiDuiHu)
         tableParameter.dwMingTang = Bit:_or(tableParameter.dwMingTang,self.MingTang_DaZiHu)
         tableParameter.dwMingTang = Bit:_or(tableParameter.dwMingTang,self.MingTang_XiaoZiHu)
-        tableParameter.dwMingTang = Bit:_or(tableParameter.dwMingTang,self.MingTang_ZhuoXiaoSan)
+        -- tableParameter.dwMingTang = Bit:_or(tableParameter.dwMingTang,self.MingTang_ZhuoXiaoSan)
         
 
 
     elseif items[2]:isBright() then
         tableParameter.bMingType = 1
-        local items3 = uiListView_parameter3:getItems()
-        if items3[1]:isBright() then
+        local items5 = uiListView_parameter5:getItems()
+        if items5[1]:isBright() then
             tableParameter.dwMingTang = Bit:_or(tableParameter.dwMingTang,self.MingTang_Yin)
         end
-        if items3[2]:isBright() then
+        if items5[2]:isBright() then
             tableParameter.dwMingTang = Bit:_or(tableParameter.dwMingTang,self.MingTang_ZhenHangHangXing)
             tableParameter.dwMingTang = Bit:_or(tableParameter.dwMingTang,self.MingTang_JiaHangHangXing)
         end
+        if items5[3]:isBright() then
+            tableParameter.dwMingTang = Bit:_or(tableParameter.dwMingTang,self.MingTang_ShuaHou)
+        end
+        if items5[4]:isBright() then
+            tableParameter.dwMingTang = Bit:_or(tableParameter.dwMingTang,self.MingTang_HaiDiHu)
+        end
+
+
+        local items6 = uiListView_parameter6:getItems()
+        if items6[1]:isBright() then
+            tableParameter.dwMingTang = Bit:_or(tableParameter.dwMingTang,self.MingTang_TingHu)
+        end
+        if items6[2]:isBright() then
+            tableParameter.dwMingTang = Bit:_or(tableParameter.dwMingTang,self.MingTang_HuangFan)
+        end
+        if items6[3]:isBright() then
+            tableParameter.dwMingTang = Bit:_or(tableParameter.dwMingTang,self.MingTang_ZhuoXiaoSan)
+        end
+
+
         tableParameter.dwMingTang = Bit:_or(tableParameter.dwMingTang,self.MingTang_ZiMo)
         tableParameter.dwMingTang = Bit:_or(tableParameter.dwMingTang,self.MingTang_HongHu)
         tableParameter.dwMingTang = Bit:_or(tableParameter.dwMingTang,self.MingTang_HeiHu)
@@ -593,7 +775,21 @@ function RoomCreateLayer:onEventCreate(nTableType)
         tableParameter.dwMingTang = Bit:_or(tableParameter.dwMingTang,self.MingTang_HeiHu)
         tableParameter.dwMingTang = Bit:_or(tableParameter.dwMingTang,self.MingTang_DianHu)
     end
-    
+
+    --选择托管时间
+    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(7),"ListView_parameter"):getItems()
+    if items[1]:isBright() then
+        tableParameter.bHostedTime = 0
+    elseif items[2]:isBright() then
+        tableParameter.bHostedTime = 1
+    elseif items[3]:isBright() then
+        tableParameter.bHostedTime = 2
+    elseif items[4]:isBright() then
+        tableParameter.bHostedTime = 3
+    elseif items[5]:isBright() then
+        tableParameter.bHostedTime = 5
+    end
+
     tableParameter.FanXing = {}
     tableParameter.FanXing.bType = 0
     tableParameter.FanXing.bCount = 0

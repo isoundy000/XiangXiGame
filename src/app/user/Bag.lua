@@ -41,9 +41,9 @@ function Bag:EVENT_TYPE_NET_RECV_MESSAGE(event)
         if StaticData.Items[wPropID] ~= nil then
             self.tableBag[wPropID] = dwPropCount
         end
-        if wPropID == 1008 or wPropID == 1003 then
+        --if wPropID == 1008 or wPropID == 1003 then
             EventMgr:dispatch(EventType.SUB_CL_USER_INFO)
-        end
+        --end
     else
     
     end

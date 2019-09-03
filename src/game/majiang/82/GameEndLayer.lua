@@ -302,6 +302,9 @@ function GameEndLayer:onCreate(pBuffer)
                 uiImage_winType:setContentSize(texture:getContentSizeInPixels())
             elseif pBuffer.wWinner[i] == true then
                 local textureName = "majiang/table/end_hupai.png"
+                if GameCommon.gameConfig.bJiePao == 0 then 
+                    textureName = "majiang/table/end_qgh.png"
+                end      
                 local texture = cc.Director:getInstance():getTextureCache():addImage(textureName)
                 uiImage_winType:loadTexture(textureName)
                 uiImage_winType:setContentSize(texture:getContentSizeInPixels())

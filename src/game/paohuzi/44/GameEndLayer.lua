@@ -543,7 +543,11 @@ function GameEndLayer:showMingTang(pBuffer)
         local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
         uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
         uiText_mingTang:setString("红胡")
-        uiText_mingTangNumber:setString(string.format("+%d番",2 + bHongCardCount - 10))
+        if  GameCommon.gameConfig.b468 == 1 then
+            uiText_mingTangNumber:setString(string.format("+%d番",4 + bHongCardCount - 10))
+        else
+            uiText_mingTangNumber:setString(string.format("+%d番",2 + bHongCardCount - 10))
+        end 
         uiListView_player:pushBackCustomItem(item)
     end  
     if Bit:_and(pBuffer.wType,PHZ_HT_ZIMO)~= 0 then
@@ -563,7 +567,11 @@ function GameEndLayer:showMingTang(pBuffer)
         local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
         uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
         uiText_mingTang:setString("点胡")
-        uiText_mingTangNumber:setString("+3番")
+        if  GameCommon.gameConfig.b468 == 1 then
+            uiText_mingTangNumber:setString("+6番")
+        else
+            uiText_mingTangNumber:setString("+3番")
+        end 
         uiListView_player:pushBackCustomItem(item)
     end 
     if Bit:_and(pBuffer.wType,PHZ_HT_HEIWU)~= 0 then
@@ -573,7 +581,11 @@ function GameEndLayer:showMingTang(pBuffer)
         local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
         uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
         uiText_mingTang:setString("黑胡")
-        uiText_mingTangNumber:setString("+5番")
+        if  GameCommon.gameConfig.b468 == 1 then
+            uiText_mingTangNumber:setString("+8番")
+        else
+            uiText_mingTangNumber:setString("+5番")
+        end 
         uiListView_player:pushBackCustomItem(item)
     end 
     if Bit:_and(pBuffer.wType,PHZ_HT_DUIDUIHU)~= 0 then
@@ -583,7 +595,11 @@ function GameEndLayer:showMingTang(pBuffer)
         local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
         uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
         uiText_mingTang:setString("对对胡")
-        uiText_mingTangNumber:setString("+4番")
+        if  GameCommon.gameConfig.b468 == 1 then
+            uiText_mingTangNumber:setString("+8番")
+        else
+            uiText_mingTangNumber:setString("+4番")
+        end 
         uiListView_player:pushBackCustomItem(item)
     end 
     if bDaCardCount >= 18 and bDaCardCount < 27 then
@@ -593,7 +609,11 @@ function GameEndLayer:showMingTang(pBuffer)
         local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
         uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
         uiText_mingTang:setString("大字胡")
-        uiText_mingTangNumber:setString(string.format("+%d番", 4 + bDaCardCount - 18))
+        if  GameCommon.gameConfig.b468 == 1 then
+            uiText_mingTangNumber:setString(string.format("+%d番", 6 + bDaCardCount - 18))
+        else
+            uiText_mingTangNumber:setString(string.format("+%d番", 4 + bDaCardCount - 18))
+        end 
         uiListView_player:pushBackCustomItem(item)
     elseif bXiaoCardCount >= 16 and bXiaoCardCount < 27 then
         local item = uiPanel_defaultPalyer:clone()
@@ -601,8 +621,12 @@ function GameEndLayer:showMingTang(pBuffer)
         uiText_mingTang:setTextColor(cc.c3b(255,165,0))
         local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
         uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
-        uiText_mingTang:setString("小字胡")
-        uiText_mingTangNumber:setString(string.format("+%d番", 4 + bXiaoCardCount - 16))
+        uiText_mingTang:setString("小字胡")       
+        if  GameCommon.gameConfig.b468 == 1 then
+            uiText_mingTangNumber:setString(string.format("+%d番", 6 + bXiaoCardCount - 16))
+        else
+            uiText_mingTangNumber:setString(string.format("+%d番", 4 + bXiaoCardCount - 16))
+        end 
         uiListView_player:pushBackCustomItem(item)
     end 
     if Bit:_and(pBuffer.wType,PHZ_HT_HAIDI)~= 0 then
@@ -612,7 +636,11 @@ function GameEndLayer:showMingTang(pBuffer)
         local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
         uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
         uiText_mingTang:setString("海底胡")
-        uiText_mingTangNumber:setString("+2番")
+        if  GameCommon.gameConfig.b468 == 1 then
+            uiText_mingTangNumber:setString("+6番")
+        else
+            uiText_mingTangNumber:setString("+2番")
+        end 
         uiListView_player:pushBackCustomItem(item)
     end 
     if Bit:_and(pBuffer.wType,PHZ_HT_TIANHU)~= 0 then
@@ -622,7 +650,11 @@ function GameEndLayer:showMingTang(pBuffer)
         local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
         uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
         uiText_mingTang:setString("天胡")
-        uiText_mingTangNumber:setString("+4番")
+        if  GameCommon.gameConfig.b468 == 1 then
+            uiText_mingTangNumber:setString("+8番")
+        else
+            uiText_mingTangNumber:setString("+4番")
+        end 
         uiListView_player:pushBackCustomItem(item)
     end 
     if Bit:_and(pBuffer.wType,PHZ_HT_DIHU)~= 0 then
@@ -632,7 +664,11 @@ function GameEndLayer:showMingTang(pBuffer)
         local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
         uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
         uiText_mingTang:setString("地胡")
-        uiText_mingTangNumber:setString("+3番")
+        if  GameCommon.gameConfig.b468 == 1 then
+            uiText_mingTangNumber:setString("+6番")
+        else
+            uiText_mingTangNumber:setString("+3番")
+        end 
         uiListView_player:pushBackCustomItem(item)
     end 
     

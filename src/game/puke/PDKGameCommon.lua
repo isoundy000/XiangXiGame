@@ -28,7 +28,7 @@ local PDKGameCommon =
     CardType_airplane       = 7,    --飞机
     CardType_4Add3          = 8,    --四带三
     CardType_bomb           = 9,    --炸弹
-        
+    CardType_4Add2          = 10,    --四带二
     dwUserID = 0,
     wBankerUser = 0,
     palyer = nil,

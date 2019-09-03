@@ -64,6 +64,11 @@ function Net:sendMsgToSvr(mainCmdId,subCmdId,strCmd,...)
         printInfo(string.format("网络已中断：mainCmdId = %d, subCmdId=%d,strCmd=%s",mainCmdId,subCmdId,strCmd))
         return false
     end
+
+    if mainCmdId ~= 0 and subCmdId ~= 3 then
+        print('发送消息:', mainCmdId,subCmdId,...)
+    end
+
     local arg = {...}
     local nStrLen = string.len(strCmd)
     self.cppFunc:beginSendBuf(mainCmdId,subCmdId)

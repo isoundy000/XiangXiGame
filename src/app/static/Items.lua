@@ -7,6 +7,7 @@ local Items = {
 [1005]={ id=1005, name="美团券", type=2, subType=0, desc="抽奖获得", img="items/item1005.png"}, 
 [1006]={ id=1006, name="猎豹1000元购车券", type=2, subType=0, desc="猎豹1000元购车券", img="items/item1006.png"},
 [1008]={ id=1008, name="红包卷", type=1, subType=0, desc="可兑换微信红包", img="items/item1008.png"}, 
+[1009]={ id=1009, name="元宝", type=1, subType=0, desc="元宝", img="items/item1006.png"},
 [2001]={ id=2001, name="特美刻保温杯", type=2, subType=0, desc="特美刻保温杯", img="items/item2001.png"},
 [2002]={ id=2002, name="帕森太阳镜男", type=2, subType=0, desc="帕森太阳镜男", img="items/item2002.png"},
 [2003]={ id=2003, name="帕森太阳镜女", type=2, subType=0, desc="帕森太阳镜女", img="items/item2003.png"},

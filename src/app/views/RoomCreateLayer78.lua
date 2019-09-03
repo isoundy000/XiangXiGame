@@ -140,7 +140,36 @@ function RoomCreateLayer:onCreate(parameter)
 
     --选择癞子
     local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(2),"ListView_parameter"):getItems()
-    Common:addCheckTouchEventListener(items)
+    Common:addCheckTouchEventListener(items,false,function(index) 
+        local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(11),"ListView_parameter"):getItems()
+        if index == 1 then
+            items[1]:setBright(false)
+            items[1]:setEnabled(false)
+            items[1]:setColor(cc.c3b(170,170,170))
+            local uiText_desc = ccui.Helper:seekWidgetByName(items[1],"Text_desc")
+            if uiText_desc ~= nil then 
+                uiText_desc:setTextColor(cc.c3b(109,58,44))
+            end
+        else
+            local items_7 = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(7),"ListView_parameter"):getItems()
+            if items_7[4]:isBright() == false then 
+                local isHaveDefault = false
+                items[1]:setEnabled(true)
+                items[1]:setColor(cc.c3b(255,255,255))
+                if items[1]:isBright() then
+                    isHaveDefault = true
+                end
+                if isHaveDefault == false then
+                    items[1]:setBright(true)
+                    local uiText_desc = ccui.Helper:seekWidgetByName(items[1],"Text_desc")
+                    if uiText_desc ~= nil then 
+                        uiText_desc:setTextColor(cc.c3b(215,86,31))
+                    end  
+                end
+            end          
+        end
+    end
+    )
     if self.recordCreateParameter["mLaiZiCount"] ~= nil and self.recordCreateParameter["mLaiZiCount"] == 1 then
         items[2]:setBright(true)
         local uiText_desc = ccui.Helper:seekWidgetByName(items[2],"Text_desc")
@@ -411,18 +440,21 @@ function RoomCreateLayer:onCreate(parameter)
                 uiText_desc:setTextColor(cc.c3b(109,58,44))
             end
         else
-            local isHaveDefault = false
-            items[1]:setEnabled(true)
-            items[1]:setColor(cc.c3b(255,255,255))
-            if items[1]:isBright() then
-                isHaveDefault = true
-            end
-            if isHaveDefault == false then
-                items[1]:setBright(true)
-                local uiText_desc = ccui.Helper:seekWidgetByName(items[1],"Text_desc")
-                if uiText_desc ~= nil then 
-                    uiText_desc:setTextColor(cc.c3b(215,86,31))
-                end  
+            local items_2 = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(2),"ListView_parameter"):getItems()
+            if items_2[1]:isBright() == false then 
+                local isHaveDefault = false
+                items[1]:setEnabled(true)
+                items[1]:setColor(cc.c3b(255,255,255))
+                if items[1]:isBright() then
+                    isHaveDefault = true
+                end
+                if isHaveDefault == false then
+                    items[1]:setBright(true)
+                    local uiText_desc = ccui.Helper:seekWidgetByName(items[1],"Text_desc")
+                    if uiText_desc ~= nil then 
+                        uiText_desc:setTextColor(cc.c3b(215,86,31))
+                    end  
+                end
             end
         end
     end)
@@ -599,20 +631,21 @@ function RoomCreateLayer:SUB_CL_FRIENDROOM_CONFIG_END(event)
         local data = self.tableFriendsRoomParams[key]
     	if data then
             local uiText_desc = ccui.Helper:seekWidgetByName(var,"Text_desc")
-            uiText_desc:setString(string.format("%d局",data.wGameCount))
+            --    uiText_desc:setString(string.format("%d局",data.wGameCount))
             local uiText_addition = ccui.Helper:seekWidgetByName(var,"Text_addition")
+            uiText_addition:setVisible(false)
             if data.dwExpendType == 1 then
                 uiText_addition:setString(string.format("金币x%d",data.dwExpendCount))
+                uiText_desc:setString(string.format("%d局 金币x%d",data.wGameCount,data.dwExpendCount))
             elseif data.dwExpendType == 2 then
                 uiText_addition:setString(string.format("元宝x%d",data.dwExpendCount))
+                uiText_desc:setString(string.format("%d局 元宝x%d",data.wGameCount,data.dwExpendCount))
             elseif data.dwExpendType == 3 then
-                if CHANNEL_ID == 20 or CHANNEL_ID == 21 then 
-                    uiText_addition:setString(string.format("(钻石x%d)",data.dwExpendCount)) 
-                else
-                    uiText_addition:setString(string.format("(%sx%d)",StaticData.Items[data.dwSubType].name,data.dwExpendCount)) 
-                end
+                uiText_addition:setString(string.format("(%sx%d)",StaticData.Items[data.dwSubType].name,data.dwExpendCount))
+                uiText_desc:setString(string.format("%d局(%sx%d)",data.wGameCount,StaticData.Items[data.dwSubType].name,data.dwExpendCount))
             else
                 uiText_addition:setString("(无消耗)")
+                uiText_desc:setString(string.format("%d局(无消耗)",data.wGameCount))
             end
             if isFound == false and self.recordCreateParameter["wGameCount"] ~= nil and self.recordCreateParameter["wGameCount"] == data.wGameCount then
                 var:setBright(true)

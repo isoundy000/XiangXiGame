@@ -649,10 +649,16 @@ function HallLayer:onCreate(parames)
     end  
     self:updateUserInfo()
 
+    --兑换中心
     local Button_duihuan = ccui.Helper:seekWidgetByName(self.root,"Button_duihuan")
     Common:addTouchEventListener(Button_duihuan,function()            
         require("common.SceneMgr"):switchOperation(require("app.MyApp"):create():createView("ExchangeCenterLayer"))
     end)
+    ccs.ArmatureDataManager:getInstance():addArmatureFileInfo("common/dhzx/dhzx.ExportJson")
+    local armature=ccs.Armature:create("dhzx")
+    armature:getAnimation():playWithIndex(0)
+    Button_duihuan:addChild(armature)
+    armature:setPosition(armature:getParent():getContentSize().width/2,armature:getParent():getContentSize().height/2)
 end
 
 --刷新个人信息
@@ -674,7 +680,7 @@ function HallLayer:updateUserInfo(event)
     uiText_gold:setString(string.format("%s",Common:itemNumberToString(UserData.User.dwGold)))   
 
     local uiText_money = ccui.Helper:seekWidgetByName(self.root,"Text_money")    
-    uiText_money:setString(string.format("%d",UserData.Bag:getBagPropCount(1008)))  
+    uiText_money:setString(string.format("%d",UserData.Bag:getBagPropCount(1009)))  
 
     local uiText_ID = ccui.Helper:seekWidgetByName(self.root,"Text_ID")
     uiText_ID:setString(string.format("ID:%d",UserData.User.userID))

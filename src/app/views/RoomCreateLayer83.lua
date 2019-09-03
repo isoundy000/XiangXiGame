@@ -195,7 +195,25 @@ function RoomCreateLayer:onCreate(parameter)
 
     --可选
     local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(4),"ListView_parameter"):getItems()
-    Common:addCheckTouchEventListener(items,true)
+    Common:addCheckTouchEventListener(items,true,function(index) 
+        local items_9 = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(9),"ListView_parameter"):getItems()
+        if items[1]:isBright() == true then
+            for key, var in pairs(items_9) do
+                var:setBright(false)
+                var:setEnabled(false)
+                var:setColor(cc.c3b(170,170,170))
+                local uiText_desc = ccui.Helper:seekWidgetByName(var,"Text_desc")
+                if uiText_desc ~= nil then 
+                    uiText_desc:setTextColor(cc.c3b(109,58,44))
+                end
+            end
+        else  
+            for key, var in pairs(items_9) do           
+                var:setEnabled(true)
+                var:setColor(cc.c3b(255,255,255))
+            end          
+        end
+    end)
 
     
     -- local uiPanel_wanFaContents = ccui.Helper:seekWidgetByName(self.root,"Panel_wanFaContents")
@@ -384,7 +402,77 @@ function RoomCreateLayer:onCreate(parameter)
             uiText_desc:setTextColor(cc.c3b(215,86,31))
         end
     end 
-    
+
+    --四带:
+    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(9),"ListView_parameter"):getItems()
+    Common:addCheckTouchEventListener(items,true)
+    if self.recordCreateParameter["bBombSeparation"] == nil or self.recordCreateParameter["bBombSeparation"] == 0 then
+        items[1]:setBright(false)
+        items[1]:setEnabled(false)
+        items[1]:setColor(cc.c3b(170,170,170))
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[1],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(109,58,44))
+        end
+    elseif self.recordCreateParameter["b4Add2"] ~= nil and self.recordCreateParameter["b4Add2"] == 1 then
+        items[1]:setBright(true)
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[1],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(215,86,31))
+        end
+    end 
+
+    if self.recordCreateParameter["bBombSeparation"] == nil or self.recordCreateParameter["bBombSeparation"] == 0 then
+        items[2]:setBright(false)
+        items[2]:setEnabled(false)
+        items[2]:setColor(cc.c3b(170,170,170))
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[2],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(109,58,44))
+        end
+    elseif self.recordCreateParameter["b4Add3"] ~= nil and self.recordCreateParameter["b4Add3"] == 1 then
+        items[2]:setBright(true)
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[2],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(215,86,31))
+        end
+    end 
+
+    --选择托管时间
+    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(10),"ListView_parameter"):getItems()
+    Common:addCheckTouchEventListener(items)
+    if self.recordCreateParameter["bHostedTime"] ~= nil and self.recordCreateParameter["bHostedTime"] == 1 then
+        items[2]:setBright(true)
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[2],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(215,86,31))
+        end 
+    elseif self.recordCreateParameter["bHostedTime"] ~= nil and self.recordCreateParameter["bHostedTime"] == 2 then
+        items[3]:setBright(true)
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[3],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(215,86,31))
+        end 
+    elseif self.recordCreateParameter["bHostedTime"] ~= nil and self.recordCreateParameter["bHostedTime"] == 3 then
+        items[4]:setBright(true)
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[3],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(215,86,31))
+        end 
+    elseif self.recordCreateParameter["bHostedTime"] ~= nil and self.recordCreateParameter["bHostedTime"] == 5 then
+        items[5]:setBright(true)
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[3],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(215,86,31))
+        end 
+    else
+        items[1]:setBright(true)
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[1],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(215,86,31))
+        end 
+    end
+
     if self.showType == 3 then
         self.tableFriendsRoomParams = {[1] = {wGameCount = 1}}
         self:SUB_CL_FRIENDROOM_CONFIG_END()
@@ -419,20 +507,21 @@ function RoomCreateLayer:SUB_CL_FRIENDROOM_CONFIG_END(event)
         local data = self.tableFriendsRoomParams[key]
     	if data then
             local uiText_desc = ccui.Helper:seekWidgetByName(var,"Text_desc")
-            uiText_desc:setString(string.format("%d局",data.wGameCount))
+            --    uiText_desc:setString(string.format("%d局",data.wGameCount))
             local uiText_addition = ccui.Helper:seekWidgetByName(var,"Text_addition")
+            uiText_addition:setVisible(false)
             if data.dwExpendType == 1 then
                 uiText_addition:setString(string.format("金币x%d",data.dwExpendCount))
+                uiText_desc:setString(string.format("%d局 金币x%d",data.wGameCount,data.dwExpendCount))
             elseif data.dwExpendType == 2 then
                 uiText_addition:setString(string.format("元宝x%d",data.dwExpendCount))
+                uiText_desc:setString(string.format("%d局 元宝x%d",data.wGameCount,data.dwExpendCount))
             elseif data.dwExpendType == 3 then
-                if CHANNEL_ID == 20 or CHANNEL_ID == 21 then 
-                    uiText_addition:setString(string.format("(钻石x%d)",data.dwExpendCount)) 
-                else
-                    uiText_addition:setString(string.format("(%sx%d)",StaticData.Items[data.dwSubType].name,data.dwExpendCount)) 
-                end  
+                uiText_addition:setString(string.format("(%sx%d)",StaticData.Items[data.dwSubType].name,data.dwExpendCount))
+                uiText_desc:setString(string.format("%d局(%sx%d)",data.wGameCount,StaticData.Items[data.dwSubType].name,data.dwExpendCount))
             else
                 uiText_addition:setString("(无消耗)")
+                uiText_desc:setString(string.format("%d局(无消耗)",data.wGameCount))
             end
             if isFound == false and self.recordCreateParameter["wGameCount"] ~= nil and self.recordCreateParameter["wGameCount"] == data.wGameCount then
                 var:setBright(true)
@@ -570,18 +659,48 @@ function RoomCreateLayer:onEventCreate(nTableType)
     end
 
     --飘分
-    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(7),"ListView_parameter"):getItems()
+    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(8),"ListView_parameter"):getItems()
     if items[1]:isBright() then
         tableParameter.bMustNextWarn = 0
     else
         tableParameter.bMustNextWarn = 1
     end
-    tableParameter.b4Add3 = 0 
+   -- tableParameter.b4Add3 = 0 
+
+    --四带
+    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(9),"ListView_parameter"):getItems()
+    if items[1]:isBright() then
+        tableParameter.b4Add2 = 1
+    else
+        tableParameter.b4Add2 = 0
+    end
+
+    if items[2]:isBright() then
+        tableParameter.b4Add3 = 1
+    else
+        tableParameter.b4Add3 = 0
+    end
+
+
     if tableParameter.b15Or16 == 1 then 
         tableParameter.bSpringMinCount = 16
     else
         tableParameter.bSpringMinCount = 15
     end 
+
+    --选择托管时间
+    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(10),"ListView_parameter"):getItems()
+    if items[1]:isBright() then
+        tableParameter.bHostedTime = 0
+    elseif items[2]:isBright() then
+        tableParameter.bHostedTime = 1
+    elseif items[3]:isBright() then
+        tableParameter.bHostedTime = 2
+    elseif items[4]:isBright() then
+        tableParameter.bHostedTime = 3
+    elseif items[5]:isBright() then
+        tableParameter.bHostedTime = 5
+    end
     
     tableParameter.bAbandon = 0
     tableParameter.bCheating = 0

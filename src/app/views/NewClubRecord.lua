@@ -94,10 +94,10 @@ function NewClubRecord:onCreate(params)
 	-- self.cellSize = cc.size(1038, 175) --宽 高
 	-- self.viewSize = cc.size(1060, 569)
 
-	self.cellSize = cc.size(1040, 175) --宽 高
-	self.viewSize = cc.size(1030, 580)
+	self.cellSize = cc.size(1030, 185) --宽 高
+	self.viewSize = cc.size(1030, 560)
 	self.listView = Common:_createList(self.viewSize, handler(self, self._itemUpdateCall), self.cellSize.width, self.cellSize.height, handler(self, self.getDataCount), nil, nil, nil, false)
-	self.listView:setPosition(cc.p(257,60))
+	self.listView:setPosition(cc.p(257,80))
 	self.Panel_record:addChild(self.listView)
 	self.listView:setBounceable(false)
 

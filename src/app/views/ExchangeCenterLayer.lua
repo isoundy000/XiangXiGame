@@ -42,6 +42,8 @@ function ExchangeCenterLayer:onConfig()
         {"Panel_recordItem"},
         {"Panel_item"},
     }
+    self.tableView = nil
+    self.itemArray = {}
 end
 
 function ExchangeCenterLayer:onEnter()
@@ -73,9 +75,21 @@ function ExchangeCenterLayer:onCreate()
             end
             self.ListView_record.loading = true
             self.ListView_record.wPageCount = self.ListView_record.wPageCount + 1
-            UserData.Mall:sendMsgGetRequestmallRecord(self.ListView_record.wPageCount)
+            UserData.Mall:sendMsgGetRequestmallRecord(UserData.User.userID, 2, self.ListView_record.wPageCount)
         end
     end)
+
+    --红包兑换记录
+    UserData.Mall:sendMsgGetRequestmallRecord(0, 11, 1)
+
+    -- for i=1,10 do
+    --     local temp = {
+    --         name = 'test_' .. i,
+    --         count = 50,
+    --     }
+    --     table.insert(self.itemArray, temp)
+    -- end
+    -- self:setTableView()
 end
 
 function ExchangeCenterLayer:onClose()
@@ -156,7 +170,7 @@ function ExchangeCenterLayer:gotoRedPage()
         Text_ziti:setTextColor(cc.c3b(141,69,0))
         local Text_money = ccui.Helper:seekWidgetByName(item,"Text_money")
         Text_money:setTextColor(cc.c3b(255,0,0))
-        Text_money:setString(string.format("%d",v.lCount))
+        Text_money:setString(string.format("%d元",v.lCount))
         local Text_number = ccui.Helper:seekWidgetByName(item,"Text_number")
         Text_number:setString(string.format("%d",v.lPrice))
      
@@ -177,8 +191,106 @@ function ExchangeCenterLayer:gotoRecordPage()
 	self.ListView_record.loading = true
     self.ListView_record.finish = false
     self.ListView_record.wPageCount = 1
-    UserData.Mall:sendMsgGetRequestmallRecord(self.ListView_record.wPageCount)
+    UserData.Mall:sendMsgGetRequestmallRecord(UserData.User.userID, 2, self.ListView_record.wPageCount)
 end
+
+-------------------tableview(head)------------------------
+--
+function ExchangeCenterLayer:setCeil(item,idx)
+    print('curCeil <--------->', idx)
+    if type(self.itemArray) ~= 'table' then
+        return
+    end
+
+    local v = self.itemArray[idx + 1]
+    if type(v) ~= 'table' then
+        return
+    end
+
+    local Text_gx = self:seekWidgetByNameEx(item,'Text_gx')
+    local Text_name = self:seekWidgetByNameEx(item,'Text_name')
+    local Text_cgdh = self:seekWidgetByNameEx(item,'Text_cgdh')
+    local Text_number = self:seekWidgetByNameEx(item,'Text_number')
+    local Text_wxhb = self:seekWidgetByNameEx(item,'Text_wxhb')
+    Text_gx:setColor(cc.c3b(109,58,44))
+    Text_name:setColor(cc.c3b(232,30,33))
+    Text_cgdh:setColor(cc.c3b(109,58,44))
+    Text_number:setColor(cc.c3b(255,107,26))
+    Text_wxhb:setColor(cc.c3b(109,58,44))
+    Text_name:setString(v.name)
+    Text_number:setString(string.format("%d元",v.count))
+end
+
+function ExchangeCenterLayer:cellSizeForTable(table,idx) 
+    return 60, 324
+end
+
+function ExchangeCenterLayer:tableCellAtIndex(table, idx)
+    local item = nil
+    local cell = table:dequeueCell()
+    if nil == cell then
+        cell = cc.TableViewCell:new()
+        item = self.Panel_item:clone()
+        cell:add(item)
+        item:setTag(123)
+        local x = item:getContentSize().width / 2
+        local y = item:getContentSize().height / 2
+        item:setPosition(cc.p(x, y))
+    else
+        item = cell:getChildByTag(123)
+    end
+
+    if nil ~= item then
+        self:setCeil(item,idx)
+    end
+
+    return cell
+end
+
+function ExchangeCenterLayer:numberOfCellsInTableView(table)
+    return #self.itemArray
+end
+
+function ExchangeCenterLayer:setTableView()
+    --待优化
+    local temp = clone(self.itemArray)
+    for i=1,10 do
+        for i,v in ipairs(temp) do
+            table.insert(self.itemArray, v)
+        end
+    end
+
+    if self.tableView then
+        self.tableView:reloadData()
+        return
+    end
+    self.tableView = cc.TableView:create(cc.size(324,397))
+    self.tableView:setDirection(cc.SCROLLVIEW_DIRECTION_VERTICAL)
+    self.tableView:setDelegate()
+    self.tableView:setVerticalFillOrder(cc.TABLEVIEW_FILL_TOPDOWN)
+    self.Panel_right:addChild(self.tableView)
+    self.tableView:registerScriptHandler(handler(self,self.cellSizeForTable),cc.TABLECELL_SIZE_FOR_INDEX)
+    self.tableView:registerScriptHandler(handler(self,self.tableCellAtIndex),cc.TABLECELL_SIZE_AT_INDEX)
+    self.tableView:registerScriptHandler(handler(self,self.numberOfCellsInTableView),cc.NUMBER_OF_CELLS_IN_TABLEVIEW)
+    self.tableView:reloadData()
+
+    self:stopAllActions()
+    local offset = self.tableView:getContentOffset()
+    local tempOffset = 0
+    local buttomHeight = #self.itemArray * 60 - 397
+    local callback = function()
+        tempOffset = tempOffset + 0.2
+        -- print('tempOffset => ', tempOffset)
+        if tempOffset > buttomHeight then
+            tempOffset = 0
+        end
+        self.tableView:setContentOffset(cc.p(offset.x, offset.y + tempOffset))
+    end
+    schedule(self, callback, 0)
+end
+--
+--------------------tableview(end)--------------------
+
 
 
 function ExchangeCenterLayer:SUB_CL_USER_INFO(event)
@@ -207,6 +319,16 @@ end
 function ExchangeCenterLayer:RET_GET_MALL_LOG(event)
     local data = event._usedata
     Log.d(data)
+
+    if not self.Image_recordLight:isVisible() then
+        local temp = {
+            name = data.szNickName,
+            count = data.lCount,
+        }
+        table.insert(self.itemArray, temp)
+        return
+    end
+
     local item = self.Panel_recordItem:clone()
     self.ListView_record:pushBackCustomItem(item)
     local Text_des = ccui.Helper:seekWidgetByName(item,"Text_des")
@@ -236,6 +358,12 @@ end
 function ExchangeCenterLayer:RET_GET_MALL_LOG_FINISH(event)
     local data = event._usedata
     Log.d(data)
+
+    if not self.Image_recordLight:isVisible() then
+        self:setTableView()
+        return
+    end
+
     self.ListView_record.loading = false
     self.ListView_record.finish = data.lRet
 end

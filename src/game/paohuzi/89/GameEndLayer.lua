@@ -557,6 +557,7 @@ function GameEndLayer:showMingTang(pBuffer)
     local MingTang_Shun                   =0x00400000
     local MingTang_ShuaHou                =0x00800000
     local MingTang_ZhuoXiaoSan            =0x01000000
+    local MingTang_HuangFan				  =0x02000000
     local MingTang_Max                    =0x80000000
     
     if Bit:_and(pBuffer.HuCardInfo.dwMingTang,MingTang_ZiMo)~= 0 then
@@ -798,6 +799,52 @@ function GameEndLayer:showMingTang(pBuffer)
             uiText_mingTangNumber:setString("+8番")
             uiListView_player:pushBackCustomItem(item)
         end 
+
+        if Bit:_and(pBuffer.HuCardInfo.dwMingTang,MingTang_ShuaHou)~= 0 then
+            local item = uiPanel_defaultPalyer:clone()
+            local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+            uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+            local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+            uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+            uiText_mingTang:setString("耍猴")
+            uiText_mingTangNumber:setString("+8番")
+            uiListView_player:pushBackCustomItem(item)
+        end 
+
+        if Bit:_and(pBuffer.HuCardInfo.dwMingTang,MingTang_HaiDiHu)~= 0 then
+            local item = uiPanel_defaultPalyer:clone()
+            local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+            uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+            local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+            uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+            uiText_mingTang:setString("海底胡")
+            uiText_mingTangNumber:setString("+6番")
+            uiListView_player:pushBackCustomItem(item)
+        end 
+
+        if Bit:_and(pBuffer.HuCardInfo.dwMingTang,MingTang_TingHu)~= 0 then
+            local item = uiPanel_defaultPalyer:clone()
+            local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+            uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+            local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+            uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+            uiText_mingTang:setString("听胡")
+            uiText_mingTangNumber:setString("+6番")
+            uiListView_player:pushBackCustomItem(item)
+        end 
+
+        if Bit:_and(pBuffer.HuCardInfo.dwMingTang,MingTang_HuangFan)~= 0 then
+            local item = uiPanel_defaultPalyer:clone()
+            local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+            uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+            local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+            uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+            uiText_mingTang:setString("黄番")
+            uiText_mingTangNumber:setString("*2倍")
+            uiListView_player:pushBackCustomItem(item)
+        end 
+
+
         
         
 
@@ -900,6 +947,61 @@ function GameEndLayer:showMingTang(pBuffer)
             uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
             uiText_mingTang:setString("真行行息")
             uiText_mingTangNumber:setString("+3番")
+            uiListView_player:pushBackCustomItem(item)
+        end 
+
+        if Bit:_and(pBuffer.HuCardInfo.dwMingTang,MingTang_ZhuoXiaoSan)~= 0 then
+            local item = uiPanel_defaultPalyer:clone()
+            local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+            uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+            local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+            uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+            uiText_mingTang:setString("捉小三")
+            uiText_mingTangNumber:setString("+8番")
+            uiListView_player:pushBackCustomItem(item)
+        end 
+
+        if Bit:_and(pBuffer.HuCardInfo.dwMingTang,MingTang_ShuaHou)~= 0 then
+            local item = uiPanel_defaultPalyer:clone()
+            local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+            uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+            local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+            uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+            uiText_mingTang:setString("耍猴")
+            uiText_mingTangNumber:setString("+8番")
+            uiListView_player:pushBackCustomItem(item)
+        end 
+
+        if Bit:_and(pBuffer.HuCardInfo.dwMingTang,MingTang_HaiDiHu)~= 0 then
+            local item = uiPanel_defaultPalyer:clone()
+            local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+            uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+            local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+            uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+            uiText_mingTang:setString("海底胡")
+            uiText_mingTangNumber:setString("+6番")
+            uiListView_player:pushBackCustomItem(item)
+        end 
+
+        if Bit:_and(pBuffer.HuCardInfo.dwMingTang,MingTang_TingHu)~= 0 then
+            local item = uiPanel_defaultPalyer:clone()
+            local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+            uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+            local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+            uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+            uiText_mingTang:setString("听胡")
+            uiText_mingTangNumber:setString("+6番")
+            uiListView_player:pushBackCustomItem(item)
+        end 
+
+        if Bit:_and(pBuffer.HuCardInfo.dwMingTang,MingTang_HuangFan)~= 0 then
+            local item = uiPanel_defaultPalyer:clone()
+            local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+            uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+            local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+            uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+            uiText_mingTang:setString("黄番")
+            uiText_mingTangNumber:setString("*2倍")
             uiListView_player:pushBackCustomItem(item)
         end 
 

@@ -96,6 +96,8 @@ function Mall:EVENT_TYPE_NET_RECV_MESSAGE(event)
         data.szPayType = netInstance.cppFunc:readRecvString(128)
         data.wStatus = netInstance.cppFunc:readRecvWORD()                  -- 0 不成功  1成功
         data.dwCreateTime = netInstance.cppFunc:readRecvDWORD()            --时间
+        data.szNickName = netInstance.cppFunc:readRecvString(32)
+        data.szLogoInfo = netInstance.cppFunc:readRecvString(256)
         EventMgr:dispatch(EventType.RET_GET_MALL_LOG,data)
 
     elseif subCmdID == NetMsgId.RET_GET_MALL_LOG_FINISH then
@@ -118,10 +120,10 @@ function Mall:sendMsgGetRechargeRecord()
     NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_MALL, NetMsgId.REQ_MALL_FIRST_CHARGE_RECORD, "")
 end
 
-function Mall:sendMsgGetRequestmallRecord(page)
-    self.tableMallFirstChargeRecord = {}
+function Mall:sendMsgGetRequestmallRecord(userID, mallID, page)
+    --self.tableMallFirstChargeRecord = {}
     local UserData = require("app.user.UserData")
-    NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_MALL, NetMsgId.REQ_GET_MALL_LOG, "ddw",UserData.User.userID,2,page)
+    NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_MALL, NetMsgId.REQ_GET_MALL_LOG, "ddw",userID,mallID,page)
 end
 
 function Mall:doPay(cbType,dwGoodsID,dwUserID,szParameter)

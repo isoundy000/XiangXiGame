@@ -415,6 +415,17 @@ function GameDesc:getGameDesc(wKindID,data,tableConfig)
        if data.bDeathCard == 1 then
             desc = desc.."/亡牌"
         end
+
+        if data.bMaxLost == 200 then
+            desc = desc.."/上限200" 
+        elseif data.bMaxLost == 100 then
+            desc = desc.."/上限100"
+        elseif data.bMaxLost == 300 then
+            desc = desc.."/上限300"
+        elseif data.bMaxLost == 0 then
+            desc = desc.."/无限"
+        end
+
        if data.bCanHuXi == 15 then
            desc = desc.."/15胡息起胡" 
        elseif data.bCanHuXi == 18 then
@@ -422,8 +433,11 @@ function GameDesc:getGameDesc(wKindID,data,tableConfig)
        elseif data.bCanHuXi == 21 then
            desc = desc.."/21胡息起胡"
        end
-       if Bit:_and(data.dwMingTang,0x01) ~= 0 then
+       if Bit:_and(data.dwMingTang,0x01) == 1 then
            desc = desc.."/15胡带名堂可胡"
+       end
+       if Bit:_and(data.dwMingTang,0x02) == 2 then
+            desc = desc.."/15胡自摸可胡"
        end
        if data.bDeathCard == 1 then
             desc = desc.."/去牌"
@@ -434,6 +448,9 @@ function GameDesc:getGameDesc(wKindID,data,tableConfig)
            desc = desc.."/600封顶"
        end
 
+       if data.b468 == 1 then
+           desc = desc.."/468红拐弯"
+       end 
         
      elseif wKindID == 39 then       
        if data.bPlayerCount == 3 then
@@ -527,6 +544,78 @@ function GameDesc:getGameDesc(wKindID,data,tableConfig)
         else
             desc = desc.."/首局随机坐庄"
         end
+
+    elseif wKindID == 51 or wKindID == 55 or wKindID == 56 or wKindID == 57 or wKindID == 58 or wKindID == 59 then          
+        if data.bBankerType == 0 then
+            desc = desc.."固定坐庄"
+        elseif data.bBankerType == 1 then
+            desc = desc.."明牌抢庄"
+        elseif data.bBankerType == 2 then
+            desc = desc.."双十上庄"
+        elseif data.bBankerType == 3 then
+            desc = desc.."通比双十"
+        elseif data.bBankerType == 4 then
+            desc = desc.."轮流坐庄"
+        else
+        
+        end
+        if data.bCanPlayingJoin == 1 then
+            desc = desc.."/允许中途加入"
+        end
+        if data.bPush == 1 then
+            desc = desc.."/闲家推注"
+        end
+        if data.bNoFlower == 1 then
+            desc = desc.."/无花牌"
+        end
+        
+        if data.bBettingType == 1 then
+            desc = desc.."/(1/2/3/4)分"
+        elseif data.bBettingType == 2 then
+            desc = desc.."/(5/6/7/8)分"
+        elseif data.bBettingType == 3 then
+            desc = desc.."/(1/2)分"
+        elseif data.bBettingType == 4 then
+            desc = desc.."/(2/4)分"
+        elseif data.bBettingType == 5 then
+            desc = desc.."/(3/6)分"
+        elseif data.bBettingType == 6 then
+            desc = desc.."/(4/8)分"
+        elseif data.bBettingType == 7 then
+            desc = desc.."/(5/10)分"
+        else
+        
+        end
+        desc = desc..string.format("/庄家倍数%d倍",data.bMultiple)
+        if data.bSettlementType == 0 then
+            desc = desc.."/扫雷"
+        else
+            desc = desc.."\n"
+        end
+        if data.bNiuType_Flush == 1 then
+            desc = desc.."同花顺x10 "
+        end
+        if data.bNiuType_Gourd == 1 then
+            desc = desc.."葫芦x6 "
+        end
+        if data.bNiuType_SameColor == 1 then
+            desc = desc.."同花x5 "
+        end
+        if data.bNiuType_Straight == 1 then
+            desc = desc.."顺子x5 "
+        end
+        if data.bSettlementType == 1 then
+            desc = desc.."金花x5 银花x4 双十x3 七~九x2"
+        elseif data.bSettlementType == 2 then
+            desc = desc.."五小x7 4炸x6 金花x5 银花x4 双十x3 七~九x2"
+        elseif data.bSettlementType == 3 then
+            desc = desc.."五小x8 4炸x7 金花x6 银花x5 双十x4 九x3 七~八x2"
+        else
+            
+        end
+        if data.bCuopai == 1 then
+            desc = desc.."/搓牌 "
+        end 
         
     elseif wKindID == 89 then        
       if data.bPlayerCount == 3 then
@@ -603,6 +692,7 @@ function GameDesc:getGameDesc(wKindID,data,tableConfig)
         local MingTang_Shun                   =0x00400000
         local MingTang_ShuaHou                =0x00800000
         local MingTang_ZhuoXiaoSan            =0x01000000
+        local MingTang_HuangFan				  =0x02000000
         local MingTang_Max                    =0x80000000
         if Bit:_and(data.dwMingTang,MingTang_Yin) ~= 0 then
             desc = desc.."/印"
@@ -627,6 +717,35 @@ function GameDesc:getGameDesc(wKindID,data,tableConfig)
         end
         if Bit:_and(data.dwMingTang,MingTang_Gai) ~= 0 then
             desc = desc.."/盖盖胡"
+        end
+
+
+        if Bit:_and(data.dwMingTang,MingTang_ShuaHou) ~= 0 then
+            desc = desc.."/耍猴"
+        end
+        if Bit:_and(data.dwMingTang,MingTang_HaiDiHu) ~= 0 then
+            desc = desc.."/海底胡"
+        end
+        if Bit:_and(data.dwMingTang,MingTang_TingHu) ~= 0 then
+            desc = desc.."/听胡"
+        end
+        if Bit:_and(data.dwMingTang,MingTang_HuangFan) ~= 0 then
+            desc = desc.."/黄番"
+        end
+        if Bit:_and(data.dwMingTang,MingTang_ZhuoXiaoSan) ~= 0 then
+            desc = desc.."/捉小三"
+        end
+
+        if data.bHostedTime == 1 then
+            desc = desc.."/一分钟托管"
+        elseif data.bHostedTime == 2 then
+            desc = desc.."/两分钟托管"
+        elseif data.bHostedTime == 3 then
+            desc = desc.."/三分钟托管"
+        elseif data.bHostedTime == 5 then
+            desc = desc.."/五分钟托管"
+        elseif data.bHostedTime == 0 then
+            desc = desc.."/无托管"
         end
 
     elseif wKindID == 88 then        
@@ -836,6 +955,9 @@ function GameDesc:getGameDesc(wKindID,data,tableConfig)
         elseif data.bRed10 == 4 then
             desc = desc.."/红桃10十分"
         end
+        if data.b4Add2 == 1 then
+            desc = desc.."/可4带2"
+        end
         if data.b4Add3 == 1 then
             desc = desc.."/可4带3"
         end
@@ -885,6 +1007,17 @@ function GameDesc:getGameDesc(wKindID,data,tableConfig)
         if data.bSpringMinCount ~= 0 then
             desc = desc..string.format("/%d张全关",data.bSpringMinCount)
         end    
+        if data.bHostedTime == 1 then
+            desc = desc.."/一分钟托管"
+        elseif data.bHostedTime == 2 then
+            desc = desc.."/两分钟托管"
+        elseif data.bHostedTime == 3 then
+            desc = desc.."/三分钟托管"
+        elseif data.bHostedTime == 5 then
+            desc = desc.."/五分钟托管"
+        elseif data.bHostedTime == 0 then
+            desc = desc.."/无托管"
+        end
     elseif wKindID == 84 then  
         if data.bPlayWayType == 0 then
             desc = desc.."经典斗地主"
@@ -1282,13 +1415,14 @@ function GameDesc:getGameDesc(wKindID,data,tableConfig)
         if data.bQGHu == 0 then             -- //是否抢杠胡  0.不抢杠胡 1.抢杠胡
             desc = desc.."/不抢杠胡"
         elseif data.bQGHu == 1 then
-            desc = desc.."/抢杠胡"
+            desc = desc.."/抢杠胡"        
+            if data.bQGHuBaoPei == 1 then       -- //是否抢杠胡包赔  1.不包赔（勾选）  0.包赔（不勾选）  默认包赔
+                desc = desc.."/不包赔"
+            elseif data.bQGHuBaoPei == 0 then
+                desc = desc.."/抢杠胡包赔"
+            end
         end        
-        if data.bQGHuBaoPei == 1 then       -- //是否抢杠胡包赔  1.不包赔（勾选）  0.包赔（不勾选）  默认包赔
-            desc = desc.."/不包赔"
-        elseif data.bQGHuBaoPei == 0 then
-            desc = desc.."/抢杠胡包赔"
-        end
+
         if data.bJiaPiao == 0 then          -- //充分    0.不飘     1.飘一   2.飘二   3.选一次漂    4.每小局选漂<发牌前飘分>
             desc = desc.."/不充"
         elseif data.bJiaPiao == 1 then
@@ -1733,6 +1867,57 @@ function GameDesc:getGameDesc(wKindID,data,tableConfig)
         if data.bDaDaoEnd then
             desc = desc.."/大倒结束"
         end
+        
+    elseif wKindID == 90 then          
+       
+        if data.bDiFen == 1 then
+            desc = desc.."(1/2/3)分"
+        elseif data.bDiFen == 2 then
+            desc = desc.."(2/4/6)分"
+        elseif data.bDiFen == 3 then
+            desc = desc.."(3/6/9)分"
+        elseif data.bDiFen == 4 then
+            desc = desc.."(4/8/12)分"
+        elseif data.bDiFen == 5 then
+            desc = desc.."(5/10/15)分"
+        else       
+        end 
+
+        if data.bCanPlayingJoin == 1 then
+            desc = desc.."/允许中途加入"
+        end
+
+        if data.bPlayerCount == 8 then
+            desc = desc.."/八人房"
+        else
+            desc = desc.."/六人房"
+        end
+
+        if data.bFKSLaiZi == 1 then
+            desc = desc.."/方块3癞子"
+        elseif data.bFKSLaiZi == 2 then
+            desc = desc.."/去掉三、四"
+        elseif data.bFKSLaiZi == 3 then
+            desc = desc.."/去掉三、四、宾王"
+        else      
+        end 
+
+
+        if data.bZhenSanPiXi == 1 then
+            desc = desc.."/真三皮喜"
+        end
+
+        if data.bDiSha == 1 then
+            desc = desc.."/底杀"
+        end
+        if data.bChaoShiQiPai == 1 then
+            desc = desc.."/超时弃牌"
+        end
+
+        if data.bJiaZhuTwo == 1 then
+            desc = desc.."/加注2次(有跟注)"
+        end
+
     end
     
     if tableConfig ~= nil and tableConfig.nTableType ~= nil and tableConfig.nTableType == TableType_ClubRoom and tableConfig.dwClubID ~= 0 then

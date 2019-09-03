@@ -61,7 +61,7 @@ function RoomCreateLayer:onCreate(parameter)
     -- local regionID = cc.UserDefault:getInstance():getIntegerForKey(Default.UserDefault_RegionID,0)
     if locationID == nil or locationID == 0 then
         for key, var in pairs(UserData.Game.talbeCommonGames) do
-            if var ~= 51 and var ~= 53 then
+            if var ~= 51 and var ~= 53 and var ~= 55 then
                 locationID = var
                 break
             end
@@ -81,11 +81,11 @@ function RoomCreateLayer:onCreate(parameter)
             uiButton_majiang:setBright(false)
             uiButton_puke:setBright(false)    
         elseif type == 2 then
-             uiButton_zipai:setBright(false)
+            uiButton_zipai:setBright(false)
             uiButton_majiang:setBright(false)
             uiButton_puke:setBright(true)
         elseif type == 3 then
-             uiButton_zipai:setBright(false)
+            uiButton_zipai:setBright(false)
             uiButton_majiang:setBright(true)
             uiButton_puke:setBright(false)
         end
@@ -94,12 +94,12 @@ function RoomCreateLayer:onCreate(parameter)
         games = clone(UserData.Game.tableSortGames)
         local isFound = false
         local tableNiuNiuUserID = {
-            [10013998]=1,[10015147]=1,[10024831]=1,[10037008]=1,[10025776]=1
+            [10013998]=1,[10015147]=1,[10024831]=1,[10037008]=1,[10025776]=1,[894766]=1,[872241]=1,[824811]=1,[589153]=1,[956816]=1,[490700]=1
         }
         for key, var in pairs(games) do
             local wKindID = tonumber(var)
             local data = StaticData.Games[wKindID]
-            if UserData.Game.tableGames[wKindID] ~= nil and Bit:_and(data.friends,1) ~= 0  and (data.type == type or type == nil ) and (wKindID ~= 51 or locationID == 51 or tableNiuNiuUserID[UserData.User.userID] ~= nil) and (wKindID ~= 53 or locationID == 53 or tableNiuNiuUserID[UserData.User.userID] ~= nil) then
+            if UserData.Game.tableGames[wKindID] ~= nil and Bit:_and(data.friends,1) ~= 0  and (data.type == type or type == nil ) and (wKindID ~= 55 or locationID == 55  or( wKindID == 55 and tableNiuNiuUserID[UserData.User.userID] ~= nil)) then
                 local item = uiButton_iten:clone()
                 item.wKindID = wKindID
                 item:setBright(false)

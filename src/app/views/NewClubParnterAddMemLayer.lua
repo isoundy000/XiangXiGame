@@ -27,13 +27,16 @@ function NewClubParnterAddMemLayer:onConfig()
 end
 
 function NewClubParnterAddMemLayer:onEnter()
+    EventMgr:registListener(EventType.RET_CLUB_GROUP_INVITE ,self,self.RET_CLUB_GROUP_INVITE)
 end
 
 function NewClubParnterAddMemLayer:onExit()
+    EventMgr:unregistListener(EventType.RET_CLUB_GROUP_INVITE ,self,self.RET_CLUB_GROUP_INVITE)
 end
 
 function NewClubParnterAddMemLayer:onCreate(param)
 	self.clubData = param[1]
+    self.isMegeClub = param[2]
 	self:initNumberArea()
 	Common:registerScriptMask(self.Image_inputFrame, function()
 		self:removeFromParent()
@@ -46,14 +49,43 @@ function NewClubParnterAddMemLayer:onAddMem()
         local numName = string.format("Text_number%d", i)
         local Text_number = ccui.Helper:seekWidgetByName(self.Image_inputFrame, numName)
         if Text_number:getString() == "" then
-            require("common.MsgBoxLayer"):create(0,nil,"输入玩家ID不正确")
+            if self.isMegeClub then
+                require("common.MsgBoxLayer"):create(0,nil,"输入亲友圈ID不正确")
+            else
+                require("common.MsgBoxLayer"):create(0,nil,"输入玩家ID不正确")
+            end
             return
         else
             roomNumber = roomNumber .. Text_number:getString()
         end
     end
-    UserData.Guild:addClubMember(self.clubData.dwClubID, tonumber(roomNumber), UserData.User.userID)
+
+    if self.isMegeClub then
+        UserData.Guild:sendClubGroupInvite(self.clubData.dwClubID, UserData.User.userID, tonumber(roomNumber))
+    else
+        UserData.Guild:addClubMember(self.clubData.dwClubID, tonumber(roomNumber), UserData.User.userID)
+    end
 	self:resetNumber()
+end
+
+function NewClubParnterAddMemLayer:RET_CLUB_GROUP_INVITE(event)
+    local data = event._usedata
+    Log.d(data)
+    if data.lRet ~= 0 then
+        if data.lRet == 1 then
+            require("common.MsgBoxLayer"):create(0,nil,"亲友圈不存在")
+        elseif data.lRet == 2 then
+            require("common.MsgBoxLayer"):create(0,nil,"目标亲友圈不存在")
+        elseif data.lRet == 3 then
+            require("common.MsgBoxLayer"):create(0,nil,"权限不足")
+        elseif data.lRet == 4 then
+            require("common.MsgBoxLayer"):create(0,nil,"不能重复邀请")
+        else
+            require("common.MsgBoxLayer"):create(0,nil,"合群发起失败")
+        end
+        return
+    end
+    require("common.MsgBoxLayer"):create(0,nil,"合群发起成功")
 end
 
 

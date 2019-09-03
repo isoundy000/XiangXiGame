@@ -68,45 +68,119 @@ function DissolutionLayer:onCreate(player,data)
     Common:addTouchEventListener(ccui.Helper:seekWidgetByName(self.root,"Button_refuse"),function() 
         NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GR_USER,NetMsgId.REQ_GR_DISMISS_TABLE_REPLY,"o",false)
     end)
-    local uiPanel_contents = ccui.Helper:seekWidgetByName(self.root,"Panel_contents")
-    local uiPanel_player = ccui.Helper:seekWidgetByName(self.root,"Panel_player")
-    uiPanel_player:retain()
-    uiPanel_contents:removeAllChildren()
-    for i=1,8 do
-        if data.dwUserIDALL[i] ~= 0 then
-            local item = uiPanel_player:clone()
-            uiPanel_contents:addChild(item)
-            local uiImage_state = ccui.Helper:seekWidgetByName(item,"Image_state")
-            if data.cbDisbandeState[i] == 1 then
-                uiImage_state:loadTexture("game/dismiss/dismiss_agree.png")
-            elseif data.cbDisbandeState[i] == 2 then
-                uiImage_state:loadTexture("game/dismiss/dismiss_refuse.png")
-                self:runAction(cc.Sequence:create(cc.DelayTime:create(0),cc.RemoveSelf:create()))
-                require("common.MsgBoxLayer"):create(2,nil,string.format("%s拒绝解散房间",data.szNickNameALL[i])) 
-                return
-            else
-                uiImage_state:loadTexture("game/dismiss/dismiss_wait.png")
-                if data.dwUserIDALL[i] == UserData.User.userID then
-                    uiPanel_btn:setVisible(true)
-                end
-            end
-            local uiText_name = ccui.Helper:seekWidgetByName(item,"Text_name")
-            uiText_name:setColor(cc.c3b(132,52,12))
-            uiText_name:setString(data.szNickNameALL[i])
-            local uiImage_avatar = ccui.Helper:seekWidgetByName(item,"Image_avatar")
-            Common:requestUserAvatar(data.dwUserIDALL[i],player[i-1].szPto,uiImage_avatar,"clip")
-            local uiImage_clip = ccui.Helper:seekWidgetByName(item,"Image_clip")
-        end
-    end
-    uiPanel_player:release()
 
-    local items = uiPanel_contents:getChildren()
-    local size = uiPanel_player:getContentSize()
-    local contentSize = uiPanel_contents:getContentSize()
-    local interval = contentSize.width/(#items+1)
-    for k,v in pairs(items) do
-        v:setPosition(interval*k,contentSize.height/2)
+
+    local count = 0
+    for i = 1, 8 do
+        if data.wKindID ~= nil and data.wKindID  == 42 then 
+            if data.dwUserIDALL[i] ~= 0 and player ~= nil and player[i] ~= nil then
+                count = count + 1
+            end 
+        else 
+            if data.dwUserIDALL[i] ~= 0 and player ~= nil and player[i-1] ~= nil then
+                count = count + 1
+            end
+        end 
     end
+    local uiPanel_contents = nil  
+    local uiPanel_contents6 = ccui.Helper:seekWidgetByName(self.root,"Panel_contents")
+    local uiPanel_contents8 = ccui.Helper:seekWidgetByName(self.root,"Panel_contents8")
+    if count > 4  then 
+        uiPanel_contents6:removeFromParent()
+        uiPanel_contents = uiPanel_contents8
+    else
+        uiPanel_contents8:removeFromParent()
+        uiPanel_contents = uiPanel_contents6
+    end 
+
+    if count <= 4  then 
+
+        --local uiPanel_contents = ccui.Helper:seekWidgetByName(self.root,"Panel_contents")
+        local uiPanel_player = ccui.Helper:seekWidgetByName(self.root,"Panel_player")
+        uiPanel_player:retain()
+        uiPanel_contents:removeAllChildren()
+        for i=1,count do
+            if data.dwUserIDALL[i] ~= 0 then
+                local item = uiPanel_player:clone()
+                uiPanel_contents:addChild(item)
+                local uiImage_state = ccui.Helper:seekWidgetByName(item,"Image_state")
+                if data.cbDisbandeState[i] == 1 then
+                    uiImage_state:loadTexture("game/dismiss/dismiss_agree.png")
+                elseif data.cbDisbandeState[i] == 2 then
+                    uiImage_state:loadTexture("game/dismiss/dismiss_refuse.png")
+                    self:runAction(cc.Sequence:create(cc.DelayTime:create(0),cc.RemoveSelf:create()))
+                    require("common.MsgBoxLayer"):create(2,nil,string.format("%s拒绝解散房间",data.szNickNameALL[i])) 
+                    return
+                else
+                    uiImage_state:loadTexture("game/dismiss/dismiss_wait.png")
+                    if data.dwUserIDALL[i] == UserData.User.userID then
+                        uiPanel_btn:setVisible(true)
+                    end
+                end
+                local uiText_name = ccui.Helper:seekWidgetByName(item,"Text_name")
+                uiText_name:setColor(cc.c3b(132,52,12))
+                uiText_name:setString(data.szNickNameALL[i])
+                local uiImage_avatar = ccui.Helper:seekWidgetByName(item,"Image_avatar")
+                Common:requestUserAvatar(data.dwUserIDALL[i],player[i-1].szPto,uiImage_avatar,"clip")
+                local uiImage_clip = ccui.Helper:seekWidgetByName(item,"Image_clip")
+            end
+        end
+        uiPanel_player:release()
+
+        local items = uiPanel_contents:getChildren()
+        local size = uiPanel_player:getContentSize()
+        local contentSize = uiPanel_contents:getContentSize()
+        local interval = contentSize.width/(#items+1)
+        for k,v in pairs(items) do
+            v:setPosition(interval*k,contentSize.height/2)
+        end
+
+    else
+        local uiListView_content = ccui.Helper:seekWidgetByName(self.root,"ListView_content")
+        local uiPanel_player = uiListView_content:getItem(0)
+        uiPanel_player:retain()
+        uiListView_content:removeAllItems()
+        local color = cc.c3b(0,0,0)
+        local refuseName = ""
+        local advocateName = ""
+        local isSwitch = true
+        for i = 1, count do
+            if data.dwUserIDALL[i] ~= 0 and player ~= nil and player[i-1] ~= nil then
+                local item = uiPanel_player:clone()
+                uiListView_content:pushBackCustomItem(item)
+                local uiText_name = ccui.Helper:seekWidgetByName(item,"Text_name")
+                uiText_name:setTextColor(cc.c3b(0,0,0))
+                uiText_name:setString(data.szNickNameALL[i])
+                uiText_name:setFontName("fonts/DFYuanW7-GB2312.ttf")
+                local uiText_tongyi = ccui.Helper:seekWidgetByName(item,"Text_tongyi")
+                uiText_tongyi:setFontName("fonts/DFYuanW7-GB2312.ttf")
+                if data.cbDisbandeState[i] == 1 then
+                    uiText_tongyi:setString("同意")
+                    uiText_tongyi:setTextColor(cc.c3b(255,255,0))
+                    if data.wAdvocateDisbandedID == i-1 then
+                        advocateName = data.szNickNameALL[i]
+                    end
+                elseif data.cbDisbandeState[i] == 2 then
+                    uiText_tongyi:setString("拒绝")
+                    uiText_tongyi:setTextColor(cc.c3b(255,255,0))
+                    refuseName = data.szNickNameALL[i]
+                    self:runAction(cc.Sequence:create(cc.DelayTime:create(0),cc.RemoveSelf:create()))
+                    require("common.MsgBoxLayer"):create(2,nil,string.format("%s拒绝解散房间",data.szNickNameALL[i])) 
+                    return
+                else
+                    if data.dwUserIDALL[i] == UserData.User.userID then
+                        uiPanel_btn:setVisible(true)
+                    end
+                    uiText_tongyi:setString("等待中")
+                    uiText_tongyi:setTextColor(cc.c3b(0,128,0))
+                end     
+            end 
+        end
+
+    end
+
+
+
 end
 
 return DissolutionLayer

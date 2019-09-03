@@ -158,8 +158,10 @@ function NewXXMallLayer:showUI(index)
             uiText_money:setString(string.format("%d元",v.lPrice))
             local function onEventBuy(sender,event)
             	self.goodsData = v
-                local data = clone(UserData.Share.tableShareParameter[7])
-                UserData.Mall:doPay(2,self.goodsData.dwGoodsID,UserData.User.userID,string.format(data.szShareUrl,self.goodsData.dwGoodsID,UserData.User.userID))
+                -- local data = clone(UserData.Share.tableShareParameter[7])
+                -- UserData.Mall:doPay(2,self.goodsData.dwGoodsID,UserData.User.userID,string.format(data.szShareUrl,self.goodsData.dwGoodsID,UserData.User.userID))
+                local data = clone(UserData.Share.tableShareParameter[12])
+                require("app.MyApp"):create(data):createView("ShareLayer") 
             end
             Common:addTouchEventListener(ccui.Helper:seekWidgetByName(item, "Button_buy"),onEventBuy)
             Common:addTouchEventListener(ccui.Helper:seekWidgetByName(item, "Button_money"),onEventBuy)
@@ -219,8 +221,10 @@ function NewXXMallLayer:showUI(index)
             uiText_money:setString(string.format("%d元",v.lPrice))
             local function onEventBuy(sender,event)
             	self.goodsData = v
-                local data = clone(UserData.Share.tableShareParameter[7])
-                UserData.Mall:doPay(2,self.goodsData.dwGoodsID,UserData.User.userID,string.format(data.szShareUrl,self.goodsData.dwGoodsID,UserData.User.userID))
+                -- local data = clone(UserData.Share.tableShareParameter[7])
+                -- UserData.Mall:doPay(2,self.goodsData.dwGoodsID,UserData.User.userID,string.format(data.szShareUrl,self.goodsData.dwGoodsID,UserData.User.userID))
+                local data = clone(UserData.Share.tableShareParameter[12])
+                require("app.MyApp"):create(data):createView("ShareLayer") 
             end
             Common:addTouchEventListener(ccui.Helper:seekWidgetByName(item, "Button_buy"),onEventBuy)
             Common:addTouchEventListener(ccui.Helper:seekWidgetByName(item, "Button_money"),onEventBuy)
@@ -279,8 +283,10 @@ function NewXXMallLayer:showUI(index)
             uiText_money:setString(string.format("%d元",v.lPrice))
             local function onEventBuy(sender,event)
             	self.goodsData = v
-                local data = clone(UserData.Share.tableShareParameter[7])
-                UserData.Mall:doPay(2,self.goodsData.dwGoodsID,UserData.User.userID,string.format(data.szShareUrl,self.goodsData.dwGoodsID,UserData.User.userID))
+                -- local data = clone(UserData.Share.tableShareParameter[7])
+                -- UserData.Mall:doPay(2,self.goodsData.dwGoodsID,UserData.User.userID,string.format(data.szShareUrl,self.goodsData.dwGoodsID,UserData.User.userID))
+                local data = clone(UserData.Share.tableShareParameter[12])
+                require("app.MyApp"):create(data):createView("ShareLayer")
             end
             Common:addTouchEventListener(ccui.Helper:seekWidgetByName(item, "Button_buy"),onEventBuy)
             Common:addTouchEventListener(ccui.Helper:seekWidgetByName(item, "Button_money"),onEventBuy)
@@ -304,7 +310,7 @@ function NewXXMallLayer:updateUserInfo()
     local uiText_gold = ccui.Helper:seekWidgetByName(self.root,"Text_gold")    
     uiText_gold:setString(string.format("%s",Common:itemNumberToString(UserData.User.dwGold)))   
     local uiText_money = ccui.Helper:seekWidgetByName(self.root,"Text_money")    
-    uiText_money:setString(string.format("%d",UserData.Bag:getBagPropCount(1008)))  
+    uiText_money:setString(string.format("%d",UserData.Bag:getBagPropCount(1009)))  
 
 end
 

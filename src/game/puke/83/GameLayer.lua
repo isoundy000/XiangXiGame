@@ -225,15 +225,24 @@ function GameLayer:readBuffer(luaFunc, mainCmdID, subCmdID)
             local luaFunc = NetMgr:getGameInstance().cppFunc
             local dwUserID=luaFunc:readRecvDWORD()
             local wChairID=luaFunc:readRecvWORD()
-            PDKGameCommon.player[wChairID].cbOnline = 0
-            self:updatePlayerOnline()
+            if PDKGameCommon.player ~= nil and PDKGameCommon.player[wChairID] ~= nil then 
+                PDKGameCommon.player[wChairID].cbOnline = 0
+                PDKGameCommon.player[wChairID].dwOfflineTime = 0
+                PDKGameCommon.player[wChairID].dwNowTime = 0 
+                self:updatePlayerOnline()
+            end
             return true
             
         elseif subCmdID == NetMsgId.SUB_GR_USER_OFFLINE then
             local luaFunc = NetMgr:getGameInstance().cppFunc
             local dwUserID=luaFunc:readRecvDWORD()
             local wChairID=luaFunc:readRecvWORD()
+            local dwOfflineTime =luaFunc:readRecvDWORD()
+            local dwNowTime =luaFunc:readRecvDWORD()
             PDKGameCommon.player[wChairID].cbOnline = 0x06
+            PDKGameCommon.player[wChairID].dwOfflineTime = dwOfflineTime
+            PDKGameCommon.player[wChairID].dwNowTime = dwNowTime
+            print("++++++++++++++时间01",wChairID,dwOfflineTime,dwNowTime)
             self:updatePlayerOnline()
             return true
             
@@ -324,6 +333,11 @@ function GameLayer:readBuffer(luaFunc, mainCmdID, subCmdID)
             data.location = {}
             data.location.x = luaFunc:readRecvDouble()
             data.location.y = luaFunc:readRecvDouble()
+            
+            
+            print("++++++++++++++时间01",wChairID,dwOfflineTime,dwNowTime)
+
+
             data.other = nil
             data.bUserCardCount = 0
             data.cbCardData = nil
@@ -936,9 +950,38 @@ function GameLayer:updatePlayerOnline()
             if PDKGameCommon.player[wChairID].cbOnline == 0x06 then
                 uiImage_offline:setVisible(true)
                 uiImage_avatar:setColor(cc.c3b(170,170,170))
+
+                if PDKGameCommon.gameConfig.bHostedTime ~= 0 then 
+                    print("++++++++++++++++++",wChairID,PDKGameCommon.player[wChairID].dwOfflineTime,PDKGameCommon.player[wChairID].dwNowTime)
+                    if PDKGameCommon.player[wChairID].dwOfflineTime ~= 0 and PDKGameCommon.player[wChairID].dwOfflineTime ~= nil then 
+                        local date = PDKGameCommon.player[wChairID].dwNowTime - PDKGameCommon.player[wChairID].dwOfflineTime   
+                        local uiText_OfflineTime = ccui.Text:create("0","fonts/DFYuanW7-GB2312.ttf","28")
+                        uiText_OfflineTime:setName('Text_OfflineTime')
+                        uiText_OfflineTime:setTextColor(cc.c3b(255,0,0)) 
+                        uiText_OfflineTime:setAnchorPoint(cc.p(0.5,0.5))
+                        uiImage_avatar:addChild(uiText_OfflineTime,100)
+                        uiText_OfflineTime:setPosition(45,40)   
+                        uiText_OfflineTime:runAction(cc.RepeatForever:create(cc.Sequence:create(cc.CallFunc:create(function(sender,event)                            
+                            if date < 0 then 
+                                date = 0
+                            end                 
+                            uiText_OfflineTime:setString(string.format("%d",date))
+                            date = date + 1
+                        end),cc.DelayTime:create(1))))                      
+                    end 
+                end
             else
                 uiImage_offline:setVisible(false)
                 uiImage_avatar:setColor(cc.c3b(255,255,255))
+
+                if PDKGameCommon.gameConfig.bHostedTime ~= 0 then 
+                    if PDKGameCommon.player[wChairID].dwOfflineTime == 0 then 
+                        local item = uiImage_avatar:getChildByName('Text_OfflineTime')      
+                        if item ~= nil then 
+                            item:removeFromParent()    
+                        end     
+                    end 
+                end
             end
             self:userInfoState(wChairID,true)
         end     
