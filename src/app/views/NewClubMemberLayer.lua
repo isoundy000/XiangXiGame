@@ -271,6 +271,8 @@ function NewClubMemberLayer:onEnter(param)
     EventMgr:registListener(EventType.RET_CLUB_PARTNER_COUNT_DETAILS_FINISH ,self,self.RET_CLUB_PARTNER_COUNT_DETAILS_FINISH)
     EventMgr:registListener(EventType.RET_CLUB_GROUP_INVITE_LOG ,self,self.RET_CLUB_GROUP_INVITE_LOG)
     EventMgr:registListener(EventType.RET_CLUB_GROUP_INVITE_REPLY ,self,self.RET_CLUB_GROUP_INVITE_REPLY)
+    EventMgr:registListener(EventType.RET_CLUB_MEMBER_INFO ,self,self.RET_CLUB_MEMBER_INFO)
+    EventMgr:registListener(EventType.RET_CLUB_MEMBER_INFO_FINISH ,self,self.RET_CLUB_MEMBER_INFO_FINISH)
 end
 
 function NewClubMemberLayer:onExit()
@@ -316,6 +318,8 @@ function NewClubMemberLayer:onExit()
     EventMgr:unregistListener(EventType.RET_CLUB_PARTNER_COUNT_DETAILS_FINISH ,self,self.RET_CLUB_PARTNER_COUNT_DETAILS_FINISH)
     EventMgr:unregistListener(EventType.RET_CLUB_GROUP_INVITE_LOG ,self,self.RET_CLUB_GROUP_INVITE_LOG)
     EventMgr:unregistListener(EventType.RET_CLUB_GROUP_INVITE_REPLY ,self,self.RET_CLUB_GROUP_INVITE_REPLY)
+    EventMgr:unregistListener(EventType.RET_CLUB_MEMBER_INFO ,self,self.RET_CLUB_MEMBER_INFO)
+    EventMgr:unregistListener(EventType.RET_CLUB_MEMBER_INFO_FINISH ,self,self.RET_CLUB_MEMBER_INFO_FINISH)
 
     --审核红点操作
     if self.clubData.dwUserID == UserData.User.userID or self:isAdmin(UserData.User.userID) then
@@ -364,7 +368,12 @@ end
 function NewClubMemberLayer:onMemFind()
     local playerid = tonumber(self.TextField_playerID:getString())
     if playerid then
-        UserData.Guild:findClubMemInfo(self.clubData.dwClubID, playerid)
+        -- UserData.Guild:findClubMemInfo(self.clubData.dwClubID, playerid)
+        if self:isHasAdmin() then
+            UserData.Guild:reqClubMemberInfo(self.clubData.dwClubID, UserData.User.userID, 0, playerid, 1)
+        else
+            UserData.Guild:reqClubMemberInfo(self.clubData.dwClubID, UserData.User.userID, 2, playerid, 1)
+        end
     else
         require("common.MsgBoxLayer"):create(0,nil,"输入玩家ID错误!")
     end
@@ -381,7 +390,12 @@ end
 function NewClubMemberLayer:onNewFind()
     local playerid = tonumber(self.TextField_newInputID:getString())
     if playerid then
-        UserData.Guild:findClubMemInfo(self.clubData.dwClubID, playerid)
+        -- UserData.Guild:findClubMemInfo(self.clubData.dwClubID, playerid)
+        if self:isHasAdmin() then
+            UserData.Guild:reqClubMemberInfo(self.clubData.dwClubID, UserData.User.userID, 0, playerid, 1)
+        else
+            UserData.Guild:reqClubMemberInfo(self.clubData.dwClubID, UserData.User.userID, 2, playerid, 1)
+        end
     else
         require("common.MsgBoxLayer"):create(0,nil,"输入玩家ID错误!")
     end
@@ -3021,6 +3035,39 @@ function NewClubMemberLayer:RET_CLUB_PARTNER_COUNT_DETAILS_FINISH(event)
         self.partnerCountDetailsState = 1
     end
     self.partnerCountDetailsPage = self.partnerCountDetailsPage + 1
+end
+
+function NewClubMemberLayer:RET_CLUB_MEMBER_INFO(event)
+    local data = event._usedata
+    Log.d(data)
+
+    if data.dwClubID == 0 then
+        require("common.MsgBoxLayer"):create(0,nil,"用户不存在!")
+        return
+    end
+    
+    if self.curSelPage == 1 then
+        self.ListView_mem:setVisible(false)
+        self.ListView_find:setVisible(true)
+        self.Image_findFrame:setVisible(false)
+        self.Button_memFind:setVisible(false)
+        self.Button_memReturn:setVisible(true)
+        self:addOnceFindMem(data)
+    elseif self.curSelPage == 4 then
+        self.ListView_new:setVisible(false)
+        self.ListView_newPush:setVisible(false)
+        self.ListView_newFind:setVisible(true)
+        self.Image_newFindFrame:setVisible(false)
+        self.Button_newFind:setVisible(false)
+        self.Button_newReturn:setVisible(true)
+        self.ListView_newFind:removeAllItems()
+        self:refreshNewList(data, self.ListView_newFind)
+    end
+end
+
+function NewClubMemberLayer:RET_CLUB_MEMBER_INFO_FINISH(event)
+     local data = event._usedata
+    Log.d(data)
 end
 
 ------------------------------------------------------------------------

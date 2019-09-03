@@ -208,6 +208,10 @@ local NetMsgId = {
     RET_GET_CLUB_APPLICATION_RECORD     = 16043,                           --返回亲友圈的申请记录
     REQ_FIND_CLUB_MEMBER                = 2309,                            --查看亲友圈成员列表
     RET_FIND_CLUB_MEMBER                = 23009,                           --查看亲友圈成员列表
+
+    REQ_CLUB_MEMBER_INFO                = 2322,                            --请求成员信息
+    RET_CLUB_MEMBER_INFO                = 23022,                           --返回成员信息
+    RET_CLUB_MEMBER_INFO_FINISH         = 23023,                           --返回成员信息完成
     
     REQ_GET_CLUB_OPERATE_RECORD         = 1651,                            --获取俱乐部操作记录
     RET_GET_CLUB_OPERATE_RECORD         = 16051,                           --返回俱乐部操作记录
@@ -383,6 +387,7 @@ local NetMsgId = {
     SUB_GR_LOGON_USERID = 2,        --I D 登录
     SUB_GR_USER_COME = 100,         --用户进入
     REQ_GR_CREATE_TABLE             = 32,                                  --请求创建桌子
+    REQ_GR_CREATE_TABLE_INVITE      = 39,                                  --请求创建桌子
     SUB_C_GAME_CONFIG = 100,    --是否翻省（永州扯胡子）
     REQ_CS_GAME_CONFIG  = 100,                                              --请求游戏配置
     RET_SC_GAME_CONFIG  = 1001,                                              --返回游戏配置
@@ -564,6 +569,7 @@ local NetMsgId = {
     SUB_S_SEND_PIAO_RESULT  =   119,--长沙麻将飘分结果
     SUB_S_OPERATE_MAIFEN = 118,     --接受买飘数据（宜春麻将） 
     SUB_C_MaiFen = 8 ,              --发送买飘数据（宜春麻将）
+    SUB_S_SEND_PIAO_RESULTWD = 156,   --接受买飘数据（王钓麻将） 
 
     SUB_S_SHANG_LOU = 157, --上楼
         

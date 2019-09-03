@@ -1214,6 +1214,29 @@ function Guild:EVENT_TYPE_NET_RECV_MESSAGE(event)
         data.szLogoInfo = luaFunc:readRecvString(256)
         EventMgr:dispatch(EventType.RET_CLUB_GROUP_INVITE_REPLY, data)
 
+    elseif mainCmdID == NetMsgId.MDM_CL_CLUB and subCmdID == NetMsgId.RET_CLUB_MEMBER_INFO then
+        local data = {}
+        data.dwClubID = luaFunc:readRecvDWORD()
+        data.dwUserID = luaFunc:readRecvDWORD()
+        data.szNickName = luaFunc:readRecvString(32)
+        data.szLogoInfo = luaFunc:readRecvString(256)
+        data.dwLastLoginTime = luaFunc:readRecvDWORD()
+        data.isEnd = luaFunc:readRecvBool()
+        data.cbOnlineStatus = luaFunc:readRecvByte()
+        data.dwJoinTime = luaFunc:readRecvDWORD()
+        data.cbOffice = luaFunc:readRecvByte()
+        data.dwPartnerID = luaFunc:readRecvDWORD()
+        data.isProhibit = luaFunc:readRecvBool()
+        data.szRemarks = luaFunc:readRecvString(32)
+        data.lFatigueValue = luaFunc:readRecvLong() / 100
+        data.szPartnerNickName = luaFunc:readRecvString(32)
+        EventMgr:dispatch(EventType.RET_CLUB_MEMBER_INFO, data)
+
+    elseif mainCmdID == NetMsgId.MDM_CL_CLUB and subCmdID == NetMsgId.RET_CLUB_MEMBER_INFO_FINISH then
+        local data = {}
+        data.isFinish = luaFunc:readRecvBool()
+        EventMgr:dispatch(EventType.RET_CLUB_MEMBER_INFO_FINISH, data)
+
     else
         return
     end
@@ -1498,6 +1521,11 @@ end
 --合群回复
 function Guild:sendClubGroupInviteReply(dwUserID, dwClubID, dwTargetClubID, bIsAgree)
     NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_CLUB_GROUP_INVITE_REPLY, "dddo", dwUserID, dwClubID, dwTargetClubID, bIsAgree)
+end
+
+--请求亲友圈成员
+function Guild:reqClubMemberInfo(dwClubID, dwOperatorID, bOperatorType, dTargetUserID, wPageIndex)
+    NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_CLUB_MEMBER_INFO, "ddbdw", dwClubID, dwOperatorID, bOperatorType, dTargetUserID, wPageIndex)
 end
 
 return Guild
