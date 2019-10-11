@@ -10,7 +10,7 @@ local Log = {}
 
 --调试信息
 function Log.d( ... )
-    if cc.PLATFORM_OS_DEVELOPER ~= PLATFORM_TYPE then
+    if true then--cc.PLATFORM_OS_DEVELOPER ~= PLATFORM_TYPE then
 	    return
 	end
 	

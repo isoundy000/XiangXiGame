@@ -8,6 +8,7 @@ StaticData.Items = require("app.static.Items")
 StaticData.Hide = require("app.static.Hide")
 StaticData.Warning = require("app.static.Warning")
 StaticData.Condition = require("app.static.Condition")
+StaticData.GM = require("app.static.GM")
 
 return StaticData
 

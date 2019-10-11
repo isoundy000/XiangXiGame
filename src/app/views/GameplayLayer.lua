@@ -80,16 +80,11 @@ function GameplayLayer:onCreate(parameter)
         uiListView_games:removeAllItems()
         local games = {}
         games = clone(UserData.Game.tableSortGames)
-        local isFound = false
-
-        local tableNiuNiuUserID = {
-            [10013998]=1,[10015147]=1,[10024831]=1,[10037008]=1,[10025776]=1,[894766]=1,[872241]=1,[824811]=1,[589153]=1,[956816]=1
-        }
-        
+        local isFound = false        
         for key, var in pairs(games) do
             local wKindID = tonumber(var)
             local data = StaticData.Games[wKindID]
-            if UserData.Game.tableGames[wKindID] ~= nil and Bit:_and(data.friends,1) ~= 0  and (data.type == type or type == nil )  and (wKindID ~= 55 or locationID == 55  or( wKindID == 55 and tableNiuNiuUserID[UserData.User.userID] ~= nil))  then
+            if UserData.Game.tableGames[wKindID] ~= nil and Bit:_and(data.friends,1) ~= 0  and (data.type == type or type == nil )  and (wKindID ~= 55 or locationID == 55  or( wKindID == 55 and StaticData.GM[UserData.User.userID] ~= nil))  then
                 local item = uiButton_iten:clone()
                 item.wKindID = wKindID
                 item:setBright(false)

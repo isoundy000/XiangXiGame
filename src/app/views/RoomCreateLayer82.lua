@@ -577,8 +577,34 @@ function RoomCreateLayer:onCreate(parameter)
 
         local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(9),"ListView_parameter"):getItems()
         if index == 1 then
+        --     local isHaveDefault = false
+        --     for i= 1 , 2 do
+        --         items[i]:setEnabled(true)
+        --         items[i]:setColor(cc.c3b(255,255,255))
+        --         if items[i]:isBright() then
+        --             isHaveDefault = true
+        --         end
+        --     end
+        --     if isHaveDefault == false then
+        --         items[1]:setBright(true)
+        --         local uiText_desc = ccui.Helper:seekWidgetByName(items[1],"Text_desc")
+        --         if uiText_desc ~= nil then 
+        --             uiText_desc:setTextColor(cc.c3b(215,86,31))
+        --         end  
+        --     end
+
+        --     for i= 3 , 4 do
+        --         items[i]:setBright(false)
+        --         items[i]:setEnabled(false)
+        --         items[i]:setColor(cc.c3b(170,170,170))
+        --         local uiText_desc = ccui.Helper:seekWidgetByName(items[i],"Text_desc")
+        --         if uiText_desc ~= nil then 
+        --             uiText_desc:setTextColor(cc.c3b(109,58,44))
+        --         end
+        --     end
+
             local isHaveDefault = false
-            for i= 1 , 2 do
+            for i= 1 , 4 do
                 items[i]:setEnabled(true)
                 items[i]:setColor(cc.c3b(255,255,255))
                 if items[i]:isBright() then
@@ -592,17 +618,8 @@ function RoomCreateLayer:onCreate(parameter)
                     uiText_desc:setTextColor(cc.c3b(215,86,31))
                 end  
             end
-
-            for i= 3 , 4 do
-                items[i]:setBright(false)
-                items[i]:setEnabled(false)
-                items[i]:setColor(cc.c3b(170,170,170))
-                local uiText_desc = ccui.Helper:seekWidgetByName(items[i],"Text_desc")
-                if uiText_desc ~= nil then 
-                    uiText_desc:setTextColor(cc.c3b(109,58,44))
-                end
-            end
-        elseif index == 2 then
+            
+        elseif index == 2   then
             for key, var in pairs(items) do
                 var:setBright(false)
                 var:setEnabled(false)
@@ -680,32 +697,32 @@ function RoomCreateLayer:onCreate(parameter)
         if uiText_desc ~= nil then 
             uiText_desc:setTextColor(cc.c3b(215,86,31))
         end 
-    elseif self.recordCreateParameter["bMaType"] ~= nil and self.recordCreateParameter["bMaType"] == 7 then
-        local isHaveDefault = false
-        for i= 1 , 2 do
-            items[i]:setEnabled(true)
-            items[i]:setColor(cc.c3b(255,255,255))
-            if items[i]:isBright() then
-                isHaveDefault = true
-            end
-        end
-        if isHaveDefault == false then
-            items[1]:setBright(true)
-            local uiText_desc = ccui.Helper:seekWidgetByName(items[1],"Text_desc")
-            if uiText_desc ~= nil then 
-                uiText_desc:setTextColor(cc.c3b(215,86,31))
-            end  
-        end
+    -- elseif self.recordCreateParameter["bMaType"] ~= nil and self.recordCreateParameter["bMaType"] == 7 then
+    --     local isHaveDefault = false
+    --     for i= 1 , 2 do
+    --         items[i]:setEnabled(true)
+    --         items[i]:setColor(cc.c3b(255,255,255))
+    --         if items[i]:isBright() then
+    --             isHaveDefault = true
+    --         end
+    --     end
+    --     if isHaveDefault == false then
+    --         items[1]:setBright(true)
+    --         local uiText_desc = ccui.Helper:seekWidgetByName(items[1],"Text_desc")
+    --         if uiText_desc ~= nil then 
+    --             uiText_desc:setTextColor(cc.c3b(215,86,31))
+    --         end  
+    --     end
 
-        for i= 3 , 4 do
-            items[i]:setBright(false)
-            items[i]:setEnabled(false)
-            items[i]:setColor(cc.c3b(170,170,170))
-            local uiText_desc = ccui.Helper:seekWidgetByName(items[i],"Text_desc")
-            if uiText_desc ~= nil then 
-                uiText_desc:setTextColor(cc.c3b(109,58,44))
-            end
-        end
+    --     for i= 3 , 4 do
+    --         items[i]:setBright(false)
+    --         items[i]:setEnabled(false)
+    --         items[i]:setColor(cc.c3b(170,170,170))
+    --         local uiText_desc = ccui.Helper:seekWidgetByName(items[i],"Text_desc")
+    --         if uiText_desc ~= nil then 
+    --             uiText_desc:setTextColor(cc.c3b(109,58,44))
+    --         end
+    --     end
     elseif self.recordCreateParameter["bMaType"] ~= nil and self.recordCreateParameter["bMaType"] == 0 then
         for key, var in pairs(items) do
             var:setBright(false)

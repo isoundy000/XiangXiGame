@@ -12,7 +12,10 @@ local HttpUrl = {
     POST_URL_StandbyServer = "http://download.hy.qilaigame.com/standbyservernew.json",                          --备用服务器列表
     POST_URL_phoneMsg = "http://pay.hy.qilaigame.com/api/Sociaty/GetPhoneVerifica?phoneNum=%s&channelID=%d",    --手机号码修改
     POST_URL_ClientStatistics = "http://management.qilaigame.com/index.php/api/ClientStatistics?Type=%d&ChannelID=%d&UserID=%d&Desc=%s",
-    POST_URL_DownShareImg = "http://management.qilaigame.com/index.php/api/CombineImg?CT=%d&CID=%d&TID=%d&ShareImg=%s"
+    POST_URL_DownShareImg = "http://management.qilaigame.com/index.php/api/CombineImg?CT=%d&CID=%d&TID=%d&ShareImg=%s",
+    POST_URL_XianLiaoToken = "https://ssgw.updrips.com/oauth2/accessToken?appid=%s&appsecret=%s&grant_type=authorization_code&code=%s",
+    POST_URL_XianLiaoLogin = "https://ssgw.updrips.com/resource/user/getUserInfo?access_token=%s",
+    
 }
 
 return HttpUrl

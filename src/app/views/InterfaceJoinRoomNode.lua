@@ -8,6 +8,8 @@ local Common = require("common.Common")
 local Default = require("common.Default")
 local GameConfig = require("common.GameConfig")
 
+local FatigueLimit = 0
+
 local InterfaceJoinRoomNode = class("InterfaceJoinRoomNode", cc.load("mvc").ViewBase)
 
 function InterfaceJoinRoomNode:onEnter()
@@ -30,6 +32,7 @@ end
 
 function InterfaceJoinRoomNode:onCreate(parameter)
     self.roomNumber = parameter[1]
+    FatigueLimit = parameter[2] or 0
     NetMgr:getGameInstance():closeConnect()
     NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_HALL,NetMsgId.REQ_CL_GAME_SERVER_BY_ID,"d",self.roomNumber)
 end
@@ -84,7 +87,14 @@ function InterfaceJoinRoomNode:SUB_GR_JOIN_TABLE_FAILED(event)
     elseif data.wErrorCode == 25 then
         require("common.MsgBoxLayer"):create(2,nil,"防沉迷配置错误,请联系群主重新设置!")
     elseif data.wErrorCode == 26 then
-        require("common.MsgBoxLayer"):create(2,nil,"您的疲劳值不够,请联系群主!")
+        -- require("common.MsgBoxLayer"):create(2,nil,"您的疲劳值不够,请联系群主!")
+        if FatigueLimit and FatigueLimit > 0 then
+            local str = string.format("您的疲劳值不足[%d],请联系群主!", FatigueLimit)
+            require("common.MsgBoxLayer"):create(2,nil, str)
+        else
+            require("common.MsgBoxLayer"):create(2,nil,"您的疲劳值不足,请联系群主!")
+        end
+        
     elseif data.wErrorCode == 27 then
         require("common.MsgBoxLayer"):create(2,nil,"亲友圈玩法不存在,请重新刷新亲友圈!")
     elseif data.wErrorCode == 28 then

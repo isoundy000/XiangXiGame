@@ -559,6 +559,13 @@ function GameDesc:getGameDesc(wKindID,data,tableConfig)
         else
         
         end
+
+        if data.bPlayerCount == 6 then
+            desc = desc.."/六人房"
+        elseif data.bPlayerCount == 8 then
+            desc = desc.."/八人房"
+        end
+
         if data.bCanPlayingJoin == 1 then
             desc = desc.."/允许中途加入"
         end
@@ -583,6 +590,10 @@ function GameDesc:getGameDesc(wKindID,data,tableConfig)
             desc = desc.."/(4/8)分"
         elseif data.bBettingType == 7 then
             desc = desc.."/(5/10)分"
+        elseif data.bBettingType == 8 then
+            desc = desc.."/(10/20)分"
+        elseif data.bBettingType == 9 then
+            desc = desc.."/(20/40)分"
         else
         
         end
@@ -1917,7 +1928,120 @@ function GameDesc:getGameDesc(wKindID,data,tableConfig)
         if data.bJiaZhuTwo == 1 then
             desc = desc.."/加注2次(有跟注)"
         end
+    elseif wKindID == 91 then 
+        if data.bPlayWayType == 0 then
+            desc = desc.."普通玩法"
+        elseif data.bPlayWayType == 0 then
+            desc = desc.."疯狂玩法"
+        end
+        if data.dwBaseSorce ~= 0 then
+            desc = desc..string.format("/底分(%d分)",data.dwBaseSorce)
+        end
 
+        if data.bCompareCardCount == 0 then
+            -- desc = desc.."/加注2次(有跟注)"
+        elseif data.bCompareCardCount == 1 then
+            desc = desc.."/1轮后可以比牌"
+        elseif data.bCompareCardCount == 2 then
+            desc = desc.."/2轮后可以比牌"
+        elseif data.bCompareCardCount == 3 then
+            desc = desc.."/3轮后可以比牌"
+        end
+
+        if data.bSameCard == 0 then
+            desc = desc.."/先比为输"
+        elseif data.bSameCard == 1 then
+            desc = desc.."/按花色比"
+        end
+        if data.bMaxLunCount == 10 then
+            desc = desc.."/10轮封顶"
+        elseif data.bMaxLunCount == 20 then
+            desc = desc.."/20轮封顶"
+        elseif data.bMaxLunCount == 30 then
+            desc = desc.."/30轮封顶"
+        end
+
+        if data.dwMaxOutSorce ~= 0 then
+            desc = desc..string.format("/%d注封顶",data.dwMaxOutSorce)
+        end
+
+        if data.bMastFloorCount ~= 0 then
+            desc = desc..string.format("/必闷%d轮",data.bMastFloorCount)
+        end
+        -- if data.wQuitTimer == 1 then
+            desc = desc..string.format("/%d秒弃牌",data.wQuitTimer)
+        -- end
+        if data.dwTHMoney ~= 0 then
+            desc = desc..string.format("/同花顺喜钱%d分",data.dwTHMoney)
+        end
+        if data.dwBZMoney ~= 0 then
+            desc = desc..string.format("/豹子喜钱%d分",data.dwBZMoney)
+        end
+        if data.bQuickMode == true then
+            desc = desc.."/快速模式"
+        end
+        if data.bCanPlayingJoin == true then
+            desc = desc.."/允许中途加入"
+        end
+        if data.bCanTouchCard == true then
+            desc = desc.."/搓牌"
+        end
+        if data.bMaxA23 == true then
+            desc = desc.."/A23>JQK"
+        end
+        if data.bCompareCardDoubleSorce == true then
+            desc = desc.."/比牌双倍分"
+        end
+
+        if data.b235ChiBaoZi == true then
+            desc = desc.."/235吃豹子"
+        end
+        if data.bSortLookCard == true then
+            desc = desc.."/按序看牌"
+        end
+        if data.bSZBigFlower == true then
+            desc = desc.."/顺子大金花"
+        end
+
+    elseif wKindID == 92 then
+        if data.bPlayerCount == 2 then
+            desc = desc.."双人竞技"
+            -- if data.bWuTong == 0 then                       --//1.有筒  0.无筒 (默认有筒)
+            --     desc = desc.."/无筒"
+            -- elseif data.bWuTong == 1 then
+            --     desc = desc.."/有筒"
+            -- end  
+        elseif data.bPlayerCount == 3 then
+            desc = desc.."3人"
+        elseif data.bPlayerCount == 4 then
+            desc = desc.."4人"
+        end
+
+        if data.mQiWangFlag == 0 then
+            desc = desc.."/七王"
+        elseif data.mQiWangFlag == 1 then
+            desc = desc.."/四王"
+        end
+
+        if data.bMaCount == 1 then                    --//马数 2、4、6
+            desc = desc.."/1个鸟"
+        elseif data.bMaCount == 2 then
+            desc = desc.."/2个鸟"
+        elseif data.bMaCount == 3 then
+            desc = desc.."/3个鸟"
+        elseif data.bMaCount == 4 then
+            desc = desc.."/4个鸟"
+        end
+
+        if data.bDaiWangYing == 1 then
+            desc = desc.."/代王硬"
+        end
+        if data.bQGHu == 1 then
+            desc = desc.."/可抢杠胡"
+        end 
+        if data.bSJZhuang == 1 then
+            desc = desc.."/首局随机庄"
+        end
     end
     
     if tableConfig ~= nil and tableConfig.nTableType ~= nil and tableConfig.nTableType == TableType_ClubRoom and tableConfig.dwClubID ~= 0 then

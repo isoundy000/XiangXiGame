@@ -27,7 +27,9 @@ function LoginLayer:onEnter()
     EventMgr:registListener(EventType.SUB_GR_JOIN_TABLE_FAILED,self,self.SUB_GR_JOIN_TABLE_FAILED,2)
     EventMgr:registListener(EventType.SUB_CL_GAME_SERVER_ERROR,self,self.SUB_CL_GAME_SERVER_ERROR,2)
     EventMgr:registListener(EventType.EVENT_TYPE_CONNECT_GAME_FAILED,self,self.EVENT_TYPE_CONNECT_GAME_FAILED,2)
-    
+    EventMgr:registListener(EventType.EVENT_TYPE_XIAN_LIAO_LOGIN,self,self.EVENT_TYPE_XIAN_LIAO_LOGIN)
+    EventMgr:registListener(EventType.EVENT_TYPE_BIND_PHONE,self,self.EVENT_TYPE_BIND_PHONE)
+
 end
 
 function LoginLayer:onExit()
@@ -42,7 +44,9 @@ function LoginLayer:onExit()
     EventMgr:unregistListener(EventType.SUB_GR_JOIN_TABLE_FAILED,self,self.SUB_GR_JOIN_TABLE_FAILED)
     EventMgr:unregistListener(EventType.SUB_CL_GAME_SERVER_ERROR,self,self.SUB_CL_GAME_SERVER_ERROR)
     EventMgr:unregistListener(EventType.EVENT_TYPE_CONNECT_GAME_FAILED,self,self.EVENT_TYPE_CONNECT_GAME_FAILED)
-    
+    EventMgr:unregistListener(EventType.EVENT_TYPE_XIAN_LIAO_LOGIN,self,self.EVENT_TYPE_XIAN_LIAO_LOGIN)
+    EventMgr:unregistListener(EventType.EVENT_TYPE_BIND_PHONE,self,self.EVENT_TYPE_BIND_PHONE)
+
 end
 
 function LoginLayer:onCreate(parames)
@@ -69,50 +73,120 @@ function LoginLayer:onCreate(parames)
 
     --用户协议
     local uiPanel_agreement = ccui.Helper:seekWidgetByName(self.root,"Panel_agreement")
-    if StaticData.Hide[CHANNEL_ID].btn4 == 0 then
-        uiPanel_agreement:setVisible(false)  
-    end 
-    local uiPanel_lookAt = ccui.Helper:seekWidgetByName(self.root,"Panel_lookAt")
-    uiPanel_lookAt:setVisible(false)
-    local uiPanel_contents = ccui.Helper:seekWidgetByName(self.root,"Panel_contents")
-    Common:addTouchEventListener(uiPanel_lookAt,function() 
-        uiPanel_lookAt:setVisible(false) 
-        uiPanel_contents:removeAllChildren()
+    uiPanel_agreement:setVisible(false)
+    Common:addTouchEventListener(uiPanel_agreement,function() 
+        uiPanel_agreement:setVisible(false) 
     end,true)
-    Common:addTouchEventListener(ccui.Helper:seekWidgetByName(self.root,"Button_agreement"),function() 
-        uiPanel_lookAt:setVisible(true)
-        if PLATFORM_TYPE ~= cc.PLATFORM_OS_DEVELOPER then
-            uiPanel_contents:removeAllChildren()
-            -- local uiWebView = ccexp.WebView:create()
-            -- uiPanel_contents:addChild(uiWebView)
-            -- uiWebView:setContentSize(uiPanel_contents:getContentSize())
-            -- uiWebView:setAnchorPoint(cc.p(0.5,0.5))
-            -- uiWebView:setPosition(uiWebView:getParent():getContentSize().width/2,uiWebView:getParent():getContentSize().height/2)
-            -- uiWebView:setScalesPageToFit(true)
-            -- uiWebView:loadURL(StaticData.Channels[CHANNEL_ID].loginAgreement)
-            --uiWebView:enableDpadNavigation(false)
-        end
+    local uiButton_agreement = ccui.Helper:seekWidgetByName(self.root,"Button_agreement")
+    if StaticData.Hide[CHANNEL_ID].btn4 == 0 then
+        uiButton_agreement:setVisible(false)  
+    end 
+    Common:addTouchEventListener(uiButton_agreement,function() 
+        uiPanel_agreement:setVisible(true)
     end)
     local uiCheckBox_agree = ccui.Helper:seekWidgetByName(self.root,"CheckBox_agree")
     
-    --处理登陆方式
-    local uiListView_btn = ccui.Helper:seekWidgetByName(self.root,"ListView_btn")
     local loginType = StaticData.Channels[CHANNEL_ID].loginType
     if PLATFORM_TYPE == cc.PLATFORM_OS_DEVELOPER then
         loginType = 1
     end
-    if loginType == 0 and StaticData.Channels[CHANNEL_ID].loginBtn == "" then
-    --第三方自动登录
-    
-    elseif loginType == 0 and StaticData.Channels[CHANNEL_ID].loginBtn ~= "" then
-        --显示第三方登录按钮
-        local btn = ccui.Button:create(StaticData.Channels[CHANNEL_ID].loginBtn,StaticData.Channels[CHANNEL_ID].loginBtn,StaticData.Channels[CHANNEL_ID].loginBtn)
-        uiListView_btn:pushBackCustomItem(btn)
-        btn:setPressedActionEnabled(true)
-        btn:addTouchEventListener(function(sender,event) 
-            if event == ccui.TouchEventType.ended then
-                if event == ccui.TouchEventType.ended then
-                    Common:palyButton()
+
+    --手机登陆
+    local uiPanel_phoneLogin = ccui.Helper:seekWidgetByName(self.root,"Panel_phoneLogin")
+    uiPanel_phoneLogin:setVisible(false)
+    Common:addTouchEventListener(uiPanel_phoneLogin,function() 
+        uiPanel_phoneLogin:setVisible(false) 
+    end,true)
+    Common:addTouchEventListener(ccui.Helper:seekWidgetByName(self.root,"Button_phoneReturn"),function()
+        uiPanel_phoneLogin:setVisible(false) 
+    end)
+    local uiTextField_phone = ccui.Helper:seekWidgetByName(self.root,"TextField_phone")
+    local uiTextField_code = ccui.Helper:seekWidgetByName(self.root,"TextField_code")
+    local uiButton_sendCode = ccui.Helper:seekWidgetByName(self.root,"Button_sendCode")
+    Common:addTouchEventListener(uiButton_sendCode,function()
+        local text = uiButton_sendCode:getTitleText()
+        local szPhone = uiTextField_phone:getString()
+        if szPhone == "" then
+            require("common.MsgBoxLayer"):create(0,nil,"手机号码不能为空!")
+        elseif string.len(szPhone) ~= 11 or tonumber(szPhone) == nil or tonumber(szPhone) < 10000000000 or tonumber(szPhone) > 99999999999 then
+            require("common.MsgBoxLayer"):create(0,nil,"手机号码错误!")
+        -- elseif szPhone == UserData.User.szPhone then
+        --     require("common.MsgBoxLayer"):create(0,nil,"不能重复绑定!")
+        else
+            uiButton_sendCode:stopAllActions()
+            local time = 60
+            uiButton_sendCode:runAction(cc.RepeatForever:create(cc.Sequence:create(
+                cc.CallFunc:create(function(sender, event)
+                    if time <= 0 then
+                        uiButton_sendCode:setEnabled(true)
+                        uiButton_sendCode:setTitleText("发送验证码")
+                        uiButton_sendCode:stopAllActions()
+                    else
+                        uiButton_sendCode:setEnabled(false)
+                        uiButton_sendCode:setTitleText(string.format("%ss重新发送",time))
+                    end
+                    time = time - 1
+                end),
+                cc.DelayTime:create(1)
+            )))
+            self.phoneData = nil
+            UserData.User:httpPhoneBind(szPhone)
+        end
+    end)
+
+    Common:addTouchEventListener(ccui.Helper:seekWidgetByName(self.root,"Button_ok"),function()
+        local szPhone = uiTextField_phone:getString()
+        local szCode = uiTextField_code:getString()
+        if szPhone == "" then
+            require("common.MsgBoxLayer"):create(0,nil,"手机号码不能为空!")
+        elseif string.len(szPhone) ~= 11 or tonumber(szPhone) == nil or tonumber(szPhone) < 10000000000 or tonumber(szPhone) > 99999999999 then
+            require("common.MsgBoxLayer"):create(0,nil,"手机号码错误!")
+        -- elseif szPhone == UserData.User.szPhone then
+        --     require("common.MsgBoxLayer"):create(0,nil,"不能重复绑定!")
+        elseif szCode == "" then
+            require("common.MsgBoxLayer"):create(0,nil,"验证码不能为空!")
+        elseif self.phoneData == nil then
+            require("common.MsgBoxLayer"):create(0,nil,"请先发送验证码!")
+        elseif self.phoneData.szPhone ~= szPhone then
+            require("common.MsgBoxLayer"):create(0,nil,"手机号码错误!!")   
+        elseif tonumber(szCode) == nil then
+            require("common.MsgBoxLayer"):create(0,nil,"验证码格式错误!")
+        elseif tonumber(szCode) ~= self.phoneData.phone_code then
+            require("common.MsgBoxLayer"):create(0,nil,"验证码错误!")
+        else
+            require("common.LoadingAnimationLayer"):create(6)
+            local data = {}
+            data.wKind = 0 
+            data.wType = 5
+            data.szAccount = szPhone
+            data.szNickName = szPhone
+            data.szLogoInfo = "0"
+            data.cbGender = 0
+            data.dwChannelID = CHANNEL_ID
+            data.szUnionid = ""
+            UserData.User:sendMsgConnectLogin(data)
+        end
+    end)
+
+    --登陆模式
+    local uiPanel_loginMode = ccui.Helper:seekWidgetByName(self.root,"Panel_loginMode")
+    uiPanel_loginMode:setVisible(false)
+    Common:addTouchEventListener(uiPanel_loginMode,function() 
+        uiPanel_loginMode:setVisible(false) 
+    end,true)
+    local uiButton_loginMode = ccui.Helper:seekWidgetByName(self.root,"Button_loginMode")
+    Common:addTouchEventListener(uiButton_loginMode,function()
+        uiPanel_loginMode:setVisible(true)
+    end)
+    local uiListView_loginModeBtn = ccui.Helper:seekWidgetByName(self.root,"ListView_loginModeBtn")
+    local uiImage_loginModeBg = ccui.Helper:seekWidgetByName(self.root,"Image_loginModeBg")
+    for i = 1 , 5 do
+        if Bit:_and(Bit:_rshift(loginType,(i-1)),1) == 1 then             
+            if i == 4 then
+                --闲聊登录
+                local btn = ccui.Button:create("login/ok_ui_l_btn2_xl.png","login/ok_ui_l_btn2_xl.png","login/ok_ui_l_btn2_xl.png")
+                uiListView_loginModeBtn:pushBackCustomItem(btn)
+                Common:addTouchEventListener(btn,function(sender,event) 
                     if uiCheckBox_agree:isSelected() == false then
                         require("common.MsgBoxLayer"):create(0,nil,"请同意游戏协议！")
                         return 
@@ -122,89 +196,101 @@ function LoginLayer:onCreate(parames)
                         return 
                     end
                     require("common.LoadingAnimationLayer"):create(6)
-                    local tableLoginInfo, lastLoginInfo = UserData.User:readLoginInfo()
-                    if UserData.User.isCancellation == false and tableLoginInfo[StaticData.Channels[CHANNEL_ID].loginMode] ~= nil then
-                        UserData.User:sendMsgConnectLogin(lastLoginInfo) 
+                    local tableLoginInfo ,data =UserData.User:readLoginInfo()
+                    if data ~= nil and self.notAuthorization and data.wType == 4 then
+                        UserData.User:sendMsgConnectLogin(data) 
                         return
                     end
-                    UserData.User:setJniSdkLogin(0,function(event) self:loginTypeExternal(event) end) 
-                end
-            end
-        end)
+                    UserData.User:xianLiaoLogin()
+                end)
 
-    else
-        for i = 1 , 3 do
-            if Bit:_and(Bit:_rshift(loginType,(i-1)),1) == 1 then
-                local btn = nil
-                if i == 1 then
-                    --手机登录
-                    btn = ccui.Button:create("login/login_tourist.png","login/login_tourist.png","login/login_tourist.png")
-                    uiListView_btn:pushBackCustomItem(btn)
-                    Common:addTouchEventListener(btn,function(sender,event) 
-                        if uiCheckBox_agree:isSelected() == false then
-                            require("common.MsgBoxLayer"):create(0,nil,"请同意游戏协议！")
-                            return 
-                        end
-                        if cc.Director:getInstance():getRunningScene():getChildByTag(LAYER_GLOBAL) ~= nil then
-                            require("common.MsgBoxLayer"):create(0,nil,"请不要重复操作！")
-                            return 
-                        end
+            elseif i == 5 then
+                --手机登录
+                local btn = ccui.Button:create("login/ok_ui_l_btn2_phone.png","login/ok_ui_l_btn2_phone.png","login/ok_ui_l_btn2_phone.png")
+                uiListView_loginModeBtn:pushBackCustomItem(btn)
+                Common:addTouchEventListener(btn,function(sender,event) 
+                    if uiCheckBox_agree:isSelected() == false then
+                        require("common.MsgBoxLayer"):create(0,nil,"请同意游戏协议！")
+                        return 
+                    end
+                    if cc.Director:getInstance():getRunningScene():getChildByTag(LAYER_GLOBAL) ~= nil then
+                        require("common.MsgBoxLayer"):create(0,nil,"请不要重复操作！")
+                        return 
+                    end
+                   
+                    local tableLoginInfo ,data =UserData.User:readLoginInfo()
+                    if data ~= nil and self.notAuthorization and data.wType == 5 then
                         require("common.LoadingAnimationLayer"):create(6)
-                        self:loginTypeTourist(sender,event)
-                    end)
-                    
-                elseif i == 2 then
-                    --QQ登录
-                    btn = ccui.Button:create("login/login_qq.png","login/login_qq.png","login/login_qq.png")
-                    uiListView_btn:pushBackCustomItem(btn)
-                    Common:addTouchEventListener(btn,function(sender,event) 
-                        if uiCheckBox_agree:isSelected() == false then
-                            require("common.MsgBoxLayer"):create(0,nil,"请同意游戏协议！")
-                            return 
-                        end
-                        if cc.Director:getInstance():getRunningScene():getChildByTag(LAYER_GLOBAL) ~= nil then
-                            require("common.MsgBoxLayer"):create(0,nil,"请不要重复操作！")
-                            return 
-                        end
-                        require("common.LoadingAnimationLayer"):create(6)
-                        if self.notAuthorization then
-                            local tableLoginInfo ,data =UserData.User:readLoginInfo()
-                            if data ~= nil then 
-                                UserData.User:sendMsgConnectLogin(data) 
-                                return
-                            end
-                        end
-                        UserData.User:setJniSdkLogin(2,function(event) self:loginTypeQQ(event) end)
-                    end)
-                    
-                else
-                    --微信登录
-                    btn = ccui.Button:create("login/login_wx.png","login/login_wx.png","login/login_wx.png")
-                    uiListView_btn:pushBackCustomItem(btn)
-                    Common:addTouchEventListener(btn,function(sender,event) 
-                        if uiCheckBox_agree:isSelected() == false then
-                            require("common.MsgBoxLayer"):create(0,nil,"请同意游戏协议！")
-                            return 
-                        end
-                        if cc.Director:getInstance():getRunningScene():getChildByTag(LAYER_GLOBAL) ~= nil then
-                            require("common.MsgBoxLayer"):create(0,nil,"请不要重复操作！")
-                            return 
-                        end
-                        require("common.LoadingAnimationLayer"):create(6)
-                        if self.notAuthorization then
-                            local tableLoginInfo ,data =UserData.User:readLoginInfo()
-                            if data ~= nil then 
-                                UserData.User:sendMsgConnectLogin(data) 
-                                return
-                            end
-                        end
-                        if PLATFORM_TYPE == cc.PLATFORM_OS_ANDROID then
-                            UserData.User:setJniSdkLogin(3,function(event) self:loginTypeWXByAndroid(event) end)
-                        else
-                            UserData.User:setJniSdkLogin(3,function(event) self:loginTypeWXByIOS(event) end)
-                        end
-                    end)
-                end
+                        UserData.User:sendMsgConnectLogin(data) 
+                        return
+                    end
+                    uiPanel_loginMode:setVisible(false) 
+                    uiPanel_phoneLogin:setVisible(true)
+                end)
+
+            else
+
+            end
+        end
+    end
+    uiListView_loginModeBtn:refreshView()
+    uiListView_loginModeBtn:setPositionX(uiImage_loginModeBg:getContentSize().width/2-uiListView_loginModeBtn:getInnerContainerSize().width/2)
+    uiListView_loginModeBtn:setPositionY(uiListView_loginModeBtn:getPositionY())
+    uiListView_loginModeBtn:setDirection(ccui.ScrollViewDir.none)    
+    local items = uiListView_loginModeBtn:getItems()
+    if #items <= 0 then
+        uiButton_loginMode:setVisible(false)
+    end
+
+    --游客和微信登陆方式
+    local uiListView_btn = ccui.Helper:seekWidgetByName(self.root,"ListView_btn")
+    for i = 1 , 5 do
+        if Bit:_and(Bit:_rshift(loginType,(i-1)),1) == 1 then
+            if i == 1 then
+                --游客登录
+                local btn = ccui.Button:create("login/login_tourist.png","login/login_tourist.png","login/login_tourist.png")
+                uiListView_btn:pushBackCustomItem(btn)
+                Common:addTouchEventListener(btn,function(sender,event) 
+                    if uiCheckBox_agree:isSelected() == false then
+                        require("common.MsgBoxLayer"):create(0,nil,"请同意游戏协议！")
+                        return 
+                    end
+                    if cc.Director:getInstance():getRunningScene():getChildByTag(LAYER_GLOBAL) ~= nil then
+                        require("common.MsgBoxLayer"):create(0,nil,"请不要重复操作！")
+                        return 
+                    end
+                    require("common.LoadingAnimationLayer"):create(6)
+                    self:loginTypeTourist(sender,event)
+                end)
+
+            elseif i == 3 then
+                --微信登录
+                local btn = ccui.Button:create("login/login_wx.png","login/login_wx.png","login/login_wx.png")
+                uiListView_btn:pushBackCustomItem(btn)
+                Common:addTouchEventListener(btn,function(sender,event) 
+                    if uiCheckBox_agree:isSelected() == false then
+                        require("common.MsgBoxLayer"):create(0,nil,"请同意游戏协议！")
+                        return 
+                    end
+                    if cc.Director:getInstance():getRunningScene():getChildByTag(LAYER_GLOBAL) ~= nil then
+                        require("common.MsgBoxLayer"):create(0,nil,"请不要重复操作！")
+                        return 
+                    end
+                    require("common.LoadingAnimationLayer"):create(6)
+                    local tableLoginInfo ,data =UserData.User:readLoginInfo()
+                    if data ~= nil and self.notAuthorization and data.wType == 3 then
+                        UserData.User:sendMsgConnectLogin(data) 
+                        return
+                    end
+                    if PLATFORM_TYPE == cc.PLATFORM_OS_ANDROID then
+                        UserData.User:setJniSdkLogin(3,function(event) self:loginTypeWXByAndroid(event) end)
+                    else
+                        UserData.User:setJniSdkLogin(3,function(event) self:loginTypeWXByIOS(event) end)
+                    end
+                end)
+
+            else
+
             end
         end
     end
@@ -213,6 +299,7 @@ function LoginLayer:onCreate(parames)
     uiListView_btn:setPositionY(uiListView_btn:getPositionY()+25)
     uiListView_btn:setDirection(ccui.ScrollViewDir.none)    
 
+    --自动登陆
     if PLATFORM_TYPE ~= cc.PLATFORM_OS_DEVELOPER and Update.isHaveUpdateSDK == 0 and parames[1] == true then
         local tableLoginInfo ,data =UserData.User:readLoginInfo()
         if data ~= nil then 
@@ -505,6 +592,12 @@ function LoginLayer:SUB_GP_LOGON_FAILURE(event)
         errorCode = "缓存未找到记录"
     elseif data.wErrorCode == 6 then
         errorCode = "验证码错误"
+    elseif data.wErrorCode == 10 then
+        errorCode = "注册账号失败"
+    elseif data.wErrorCode == 11 then
+        errorCode = "尚未绑定闲聊账号"
+    elseif data.wErrorCode == 11 then
+        errorCode = "尚未绑定手机账号"
     else    
         errorCode = "未知错误"
     end
@@ -570,6 +663,35 @@ end
 
 function LoginLayer:EVENT_TYPE_CONNECT_GAME_FAILED(event)
     require("common.SceneMgr"):switchScene(require("app.MyApp"):create(true):createView("HallLayer"),SCENE_HALL)
+end
+
+function LoginLayer:EVENT_TYPE_XIAN_LIAO_LOGIN(event)
+    local xianLiaodata = event._usedata
+    if xianLiaodata.err_code ~= 0 then
+        return require("common.MsgBoxLayer"):create(0,nil,string.format("%s,错误码:%d",xianLiaodata.err_msg,xianLiaodata.err_code))
+    end
+
+    local data = {}
+    data.wKind = 0 
+    data.wType = 4
+    data.szAccount = xianLiaodata.data.openId
+    data.szNickName = xianLiaodata.data.nickName
+    data.szLogoInfo = xianLiaodata.data.originalAvatar
+    data.cbGender = xianLiaodata.data.gender
+    data.dwChannelID = CHANNEL_ID
+    data.szUnionid = ""
+    UserData.User:sendMsgConnectLogin(data)
+    
+end
+
+function LoginLayer:EVENT_TYPE_BIND_PHONE(event)
+    local data = event._usedata
+    if data.code ~= 0 then
+        require("common.MsgBoxLayer"):create(0,nil,data.Msg)
+        return
+    end
+
+    self.phoneData = data
 end
 
 return LoginLayer

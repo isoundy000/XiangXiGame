@@ -31,7 +31,6 @@ function SettingsLayer:onCreate(parames)
         require("common.SceneMgr"):switchOperation()
     end)
 
-    print("++++++++++++!",parames)
     self:initSound(parames)  
 end
 

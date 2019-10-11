@@ -2524,10 +2524,10 @@ function NewClubMemberLayer:RET_GET_CLUB_MEMBER_FATIGUE_RECORD(event)
         end
 
         if data.lFatigue >= 0 then
-            local des = string.format(' %s游戏消耗+%d,当前剩余%0.2f.', gameName, data.lFatigue, data.lNewFatigue)
+            local des = string.format(' %s游戏消耗+%0.2f,当前剩余%0.2f.', gameName, data.lFatigue, data.lNewFatigue)
             Text_desfont:setString(timeStr .. des)
         else
-            local des = string.format(' %s游戏消耗%d,当前剩余%0.2f.', gameName, data.lFatigue, data.lNewFatigue)
+            local des = string.format(' %s游戏消耗%0.2f,当前剩余%0.2f.', gameName, data.lFatigue, data.lNewFatigue)
             Text_desfont:setString(timeStr .. des)
         end
         listview:refreshView()
@@ -2544,10 +2544,10 @@ function NewClubMemberLayer:RET_GET_CLUB_MEMBER_FATIGUE_RECORD(event)
         end
 
         if data.lFatigue >= 0 then
-            local des = string.format(' %s游戏对局+%d,当前剩余%0.2f.', gameName, data.lFatigue, data.lNewFatigue)
+            local des = string.format(' %s游戏对局+%0.2f,当前剩余%0.2f.', gameName, data.lFatigue, data.lNewFatigue)
             Text_desfont:setString(timeStr .. des)
         else
-            local des = string.format(' %s游戏对局%d,当前剩余%0.2f.', gameName, data.lFatigue, data.lNewFatigue)
+            local des = string.format(' %s游戏对局%0.2f,当前剩余%0.2f.', gameName, data.lFatigue, data.lNewFatigue)
             Text_desfont:setString(timeStr .. des)
         end
         listview:refreshView()

@@ -9,6 +9,8 @@ local Default = require("common.Default")
 local GameDesc = require("common.GameDesc")
 local GameConfig = require("common.GameConfig")
 
+local FatigueLimit = 0
+
 local InterfaceCreateRoomNode = class("InterfaceCreateRoomNode", cc.load("mvc").ViewBase)
 
 function InterfaceCreateRoomNode:onEnter()
@@ -42,6 +44,8 @@ function InterfaceCreateRoomNode:onCreate(parameter)
         self.wGameCount     = parameter[4]
         self.tableParameter = parameter[6]
     end
+
+    FatigueLimit = parameter[7] or 0
 
     NetMgr:getGameInstance():closeConnect()
 
@@ -86,7 +90,14 @@ function InterfaceCreateRoomNode:SUB_GR_CREATE_TABLE_FAILED(event)
     elseif errorID == 20 then
         require("common.MsgBoxLayer"):create(2,nil,"您已被群主暂停娱乐,请联系群主恢复!")
     elseif errorID == 21 then
-        require("common.MsgBoxLayer"):create(2,nil,"您的疲劳值不够,请联系群主!")
+        -- require("common.MsgBoxLayer"):create(2,nil,"您的疲劳值不够,请联系群主!")
+        if FatigueLimit and FatigueLimit > 0 then
+            local str = string.format("您的疲劳值不足[%d],请联系群主!", FatigueLimit)
+            require("common.MsgBoxLayer"):create(2,nil, str)
+        else
+            require("common.MsgBoxLayer"):create(2,nil,"您的疲劳值不足,请联系群主!")
+        end
+
     elseif errorID == 22 then
         require("common.MsgBoxLayer"):create(2,nil,"防沉迷配置错误,请联系群主重新设置!")
     elseif errorID == 23 then
@@ -210,12 +221,20 @@ function InterfaceCreateRoomNode:SUB_GR_LOGON_SUCCESS(event)
             self.tableParameter.bPlayerCount,self.tableParameter.bDiFen,self.tableParameter.bFKSLaiZi,self.tableParameter.bZhenSanPiXi,
             self.tableParameter.bDiSha,self.tableParameter.bChaoShiQiPai,self.tableParameter.bCanPlayingJoin,self.tableParameter.bJiaZhuTwo)
     elseif self.wKindID == 91  then
-        NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GR_USER,NetMsgId.REQ_GR_CREATE_TABLE,"diwwwwdbbdbbbdbwddooooo",
+        NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GR_USER,NetMsgId.REQ_GR_CREATE_TABLE,"diwwwwdbbdbbbdbwddoooooooo",
             CHANNEL_ID,self.nTableType,self.wTableSubType,self.wKindID,self.wGameCount,1,self.dwTargetID,
             self.tableParameter.bPlayerCount,self.tableParameter.bPlayWayType,self.tableParameter.dwBaseSorce,self.tableParameter.bCompareCardCount,
             self.tableParameter.bSameCard,self.tableParameter.bMaxLunCount,self.tableParameter.dwMaxOutSorce,self.tableParameter.bMastFloorCount,
             self.tableParameter.wQuitTimer,self.tableParameter.dwTHMoney,self.tableParameter.dwBZMoney,self.tableParameter.bQuickMode,
-            self.tableParameter.bCanPlayingJoin,self.tableParameter.bCanTouchCard,self.tableParameter.bMaxA23,self.tableParameter.bCompareCardDoubleSorce)                    
+            self.tableParameter.bCanPlayingJoin,self.tableParameter.bCanTouchCard,self.tableParameter.bMaxA23,self.tableParameter.bCompareCardDoubleSorce,
+            self.tableParameter.b235ChiBaoZi,self.tableParameter.bSortLookCard,self.tableParameter.bSZBigFlower)     
+            
+    elseif self.wKindID == 92 then 
+        NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GR_USER,NetMsgId.REQ_GR_CREATE_TABLE,"diwwwwdbbbbbbbbb",
+            CHANNEL_ID,self.nTableType,self.wTableSubType,self.wKindID,self.wGameCount,1,self.dwTargetID,self.tableParameter.bPlayerCount,
+            self.tableParameter.mQiWangFlag,self.tableParameter.bMaCount,self.tableParameter.bDaiWangYing,self.tableParameter.bQGHu,
+            self.tableParameter.bSJZhuang,self.tableParameter.mZXFlag,self.tableParameter.bMaType,self.tableParameter.mNiaoType
+        )  
     else
     end
 end

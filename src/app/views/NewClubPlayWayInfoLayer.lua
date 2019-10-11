@@ -256,7 +256,7 @@ function NewClubPlayWayInfoLayer:onAchieve()
         playTbl.payCount3 = 0
     end
 
-    playTbl.isTableCharge = self.clubData.isTableCharge[self.clubData.idx]
+    playTbl.isTableCharge = self.clubData.isTableCharge[self.clubData.idx] or false
     if playTbl.isTableCharge then
         playTbl.tableLimit = tonumber(self.TextField_criticalNum:getString())
         if not Common:isInterNumber(playTbl.tableLimit) then
@@ -292,32 +292,34 @@ end
 ------------------------------------------------------------------------
 --初始化UI
 function NewClubPlayWayInfoLayer:initUI(data, isModifyPlayName)
+    Log.d(data)
 	local desc = require("common.GameDesc"):getGameDesc(data.wKindID, data.tableParameter)
     self.Text_playwaydes:setString(desc)
 
-    if not isModifyPlayName and data.szParameterName[data.idx] ~= "" and data.szParameterName[data.idx] ~= " " then
+    if not isModifyPlayName and data.szParameterName[data.idx] and data.szParameterName[data.idx] ~= "" and data.szParameterName[data.idx] ~= " " then
     	self.TextField_playway:setString(data.szParameterName[data.idx])
     else
     	local text = StaticData.Games[data.wKindID].name
     	self.TextField_playway:setString(text)
     end
 
-    self.gameMode = data.cbMode[data.idx]
+    self.gameMode = data.cbMode[data.idx] or 0
     self:switchPlayerMode(self.gameMode)
 
-    self.payMode = data.cbPayMode[data.idx]
+    self.payMode = data.cbPayMode[data.idx] or 0
     self:switchPayMode(self.payMode)
 
     local idx = data.idx
-    if data.wTableCell[idx] == 0 then
+    if not data.wTableCell[idx] or data.wTableCell[idx] == 0 then
         data.wTableCell[idx] = 1
     end
-    self.TextField_criticalNum:setString(data.lTableLimit[idx])
-    self.TextField_powerNum:setString(data.wTableCell[idx])
-    self.TextField_aaValue:setString(data.dwPayCount[idx][1])
+    self.TextField_criticalNum:setString(data.lTableLimit[idx] or 0)
+    self.TextField_powerNum:setString(data.wTableCell[idx] or 0)
+    local dwPayCount = data.dwPayCount[idx] or {0,0,0}
+    self.TextField_aaValue:setString(dwPayCount[1])
     self:initLimitRand(data)
 
-    if data.isTableCharge[data.idx] ~= false then
+    if data.isTableCharge[data.idx] then
         self:switchTableCharge(true)
     else
         self:switchTableCharge(false)
@@ -328,7 +330,7 @@ function NewClubPlayWayInfoLayer:initUI(data, isModifyPlayName)
         self.Text_statistics:setVisible(false)
     end
 
-    self.Text_autoDissTable:setString(data.lFatigueLimit[data.idx])
+    self.Text_autoDissTable:setString(data.lFatigueLimit[data.idx] or 0)
 
     if data.isPercentage[idx] then
         self.Image_percent:getChildByName('Image_light'):setVisible(true)
@@ -341,6 +343,8 @@ end
 function NewClubPlayWayInfoLayer:initLimitRand(data)
     self.ListView_win:removeAllItems()
     local idx = data.idx
+    data.dwPayLimit[idx] = data.dwPayLimit[idx] or {0,0,0}
+    data.dwPayCount[idx] = data.dwPayCount[idx] or {0,0,0}
     local count = 0
     for i=1,3 do
         local limitData = data.dwPayLimit[idx][i] or 0
@@ -767,13 +771,20 @@ function NewClubPlayWayInfoLayer:sendSetPlayWay(data)
             data.tableParameter.bPlayerCount,data.tableParameter.bDiFen,data.tableParameter.bFKSLaiZi,data.tableParameter.bZhenSanPiXi,
             data.tableParameter.bDiSha,data.tableParameter.bChaoShiQiPai,data.tableParameter.bCanPlayingJoin,data.tableParameter.bJiaZhuTwo)
     elseif data.wKindID == 91 then
-        NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_SETTINGS_CLUB_PLAY,"bddwwwbbddddddolwolnsbbdbbbdbwddooooo",
+        NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_SETTINGS_CLUB_PLAY,"bddwwwbbddddddolwolnsbbdbbbdbwddoooooooo",
             data.settype,data.dwClubID,data.playid,data.wKindID,data.wGameCount,1,
             data.cbMode,data.payMode,data.payLimit1,data.payCount1,data.payLimit2,data.payCount2,data.payLimit3,data.payCount3,data.isPercentage,data.tableLimit,data.fatigueCell,data.isTableCharge,data.fatigueLimit,32,data.szParameterName,
             data.tableParameter.bPlayerCount,data.tableParameter.bPlayWayType,data.tableParameter.dwBaseSorce,data.tableParameter.bCompareCardCount,
             data.tableParameter.bSameCard,data.tableParameter.bMaxLunCount,data.tableParameter.dwMaxOutSorce,data.tableParameter.bMastFloorCount,
             data.tableParameter.wQuitTimer,data.tableParameter.dwTHMoney,data.tableParameter.dwBZMoney,data.tableParameter.bQuickMode,
-            data.tableParameter.bCanPlayingJoin,data.tableParameter.bCanTouchCard,data.tableParameter.bMaxA23,data.tableParameter.bCompareCardDoubleSorce)        
+            data.tableParameter.bCanPlayingJoin,data.tableParameter.bCanTouchCard,data.tableParameter.bMaxA23,data.tableParameter.bCompareCardDoubleSorce,
+            data.tableParameter.b235ChiBaoZi,data.tableParameter.bSortLookCard,data.tableParameter.bSZBigFlower)       
+    elseif data.wKindID == 92 then
+        NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_SETTINGS_CLUB_PLAY,"bddwwwbbddddddolwolnsbbbbbbbbb",
+            data.settype,data.dwClubID,data.playid,data.wKindID,data.wGameCount,1,
+            data.cbMode,data.payMode,data.payLimit1,data.payCount1,data.payLimit2,data.payCount2,data.payLimit3,data.payCount3,data.isPercentage,data.tableLimit,data.fatigueCell,data.isTableCharge,data.fatigueLimit,32,data.szParameterName,
+            data.tableParameter.bPlayerCount,data.tableParameter.mQiWangFlag,data.tableParameter.bMaCount,data.tableParameter.bDaiWangYing,data.tableParameter.bQGHu, 
+            data.tableParameter.bSJZhuang,data.tableParameter.mZXFlag,data.tableParameter.bMaType,data.tableParameter.mNiaoType)    
     else
     end
 end

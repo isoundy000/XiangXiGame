@@ -745,6 +745,11 @@ function Guild:EVENT_TYPE_NET_RECV_MESSAGE(event)
 
         EventMgr:dispatch(EventType.RET_REFRESH_CLUB_PLAY, data)
 
+    elseif mainCmdID == NetMsgId.MDM_CL_CLUB and subCmdID == NetMsgId.RET_REFRESH_CLUB_PLAY_FINISH then
+        local data = {}
+        data.isFinish = luaFunc:readRecvBool()
+        EventMgr:dispatch(EventType.RET_REFRESH_CLUB_PLAY_FINISH, data)
+
     elseif mainCmdID == NetMsgId.MDM_CL_CLUB and subCmdID == NetMsgId.RET_SETTINGS_CLUB_PLAY then
         --返回设置亲友圈玩法
         local data = {}
@@ -831,6 +836,11 @@ function Guild:EVENT_TYPE_NET_RECV_MESSAGE(event)
         data.dwTargetID = luaFunc:readRecvDWORD()
 
         EventMgr:dispatch(EventType.RET_SETTINGS_CLUB_PLAY, data)
+
+    elseif mainCmdID == NetMsgId.MDM_CL_CLUB and subCmdID == NetMsgId.RET_SETTINGS_CLUB_PLAY_FINISH then
+        local data = {}
+        data.isFinish = luaFunc:readRecvBool()
+        EventMgr:dispatch(EventType.RET_SETTINGS_CLUB_PLAY_FINISH, data)
 
     elseif mainCmdID == NetMsgId.MDM_CL_CLUB and subCmdID == NetMsgId.RET_SETTINGS_CLUB_MEMBER then
         --返回修改亲友圈成员

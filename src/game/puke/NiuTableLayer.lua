@@ -95,6 +95,10 @@ function TableLayer:doAction(action,pBuffer)
                 tableBettingType = {4,8}
             elseif GameCommon.gameConfig.bBettingType == 7 then
                 tableBettingType = {5,10}
+            elseif GameCommon.gameConfig.bBettingType == 8 then
+                tableBettingType = {10,20}
+            elseif GameCommon.gameConfig.bBettingType == 9 then
+                tableBettingType = {20,40}
             end
             if wChairID == GameCommon:getRoleChairID() then
                 if GameCommon.gameConfig.bBettingType == 1 then
@@ -119,16 +123,43 @@ function TableLayer:doAction(action,pBuffer)
                 elseif GameCommon.gameConfig.bBettingType == 7 then
                     table.insert(tableBettingType,#tableBettingType+1,25)
                     table.insert(tableBettingType,#tableBettingType+1,50)
+                elseif GameCommon.gameConfig.bBettingType == 8 then
+                    table.insert(tableBettingType,#tableBettingType+1,50)
+                    table.insert(tableBettingType,#tableBettingType+1,100)
+                elseif GameCommon.gameConfig.bBettingType == 9 then
+                    table.insert(tableBettingType,#tableBettingType+1,100)
+                    table.insert(tableBettingType,#tableBettingType+1,200)
                 end
             end
             for key, var in pairs(tableBettingType) do
-            	local img = string.format("puke/table/pukenew_scorebtn_%d.png",var)
-            	if (GameCommon.gameConfig.bBettingType == 1 or GameCommon.gameConfig.bBettingType == 3 )  and var == 5 then
-                    img = "puke/table/pukenew_scorebtn_5_ex.png"
-                elseif GameCommon.gameConfig.bBettingType ~= 7 and var == 10 then
-                    img = "puke/table/pukenew_scorebtn_10_ex.png"
+            	local img = "puke/table/ok_ui_group_btn_2.png"
+            	if GameCommon.gameConfig.bBettingType == 1  and (var == 5 or var == 10 or var == 20  ) then
+                    img = "puke/table/ok_ui_group_btn_1.png"
+                elseif GameCommon.gameConfig.bBettingType == 2  and (var == 10 or var == 20  ) then
+                    img = "puke/table/ok_ui_group_btn_1.png"
+                elseif GameCommon.gameConfig.bBettingType == 3 and (var == 5 or var == 10  ) then
+                    img = "puke/table/ok_ui_group_btn_1.png"
+                elseif GameCommon.gameConfig.bBettingType == 4 and (var == 10 or var == 20  ) then
+                    img = "puke/table/ok_ui_group_btn_1.png"
+                elseif GameCommon.gameConfig.bBettingType == 5 and (var == 15 or var == 30  ) then
+                    img = "puke/table/ok_ui_group_btn_1.png"
+                elseif GameCommon.gameConfig.bBettingType == 6 and (var == 20 or var == 40  ) then
+                    img = "puke/table/ok_ui_group_btn_1.png"
+                elseif GameCommon.gameConfig.bBettingType == 7 and (var == 25 or var == 50  ) then
+                    img = "puke/table/ok_ui_group_btn_1.png"
+                elseif GameCommon.gameConfig.bBettingType == 8 and (var == 50 or var == 100  ) then
+                    img = "puke/table/ok_ui_group_btn_1.png"
+                elseif GameCommon.gameConfig.bBettingType == 9 and (var == 100 or var == 200  ) then
+                    img = "puke/table/ok_ui_group_btn_1.png"
             	end
                 local item = ccui.Button:create(img,img,img)
+
+                local uiHongZiCount = ccui.Text:create(string.format("%d分",var),"fonts/DFYuanW7-GB2312.ttf","30")
+                uiHongZiCount:setTextColor(cc.c3b(255,255,255)) 
+                uiHongZiCount:setAnchorPoint(cc.p(0.5,0.5))
+                item:addChild(uiHongZiCount)
+                uiHongZiCount:setPosition(43,25)
+                item:setScale(1.5)
                 uiListView_betting:pushBackCustomItem(item)
                 Common:addTouchEventListener(item,function() 
                     NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GF_GAME,NetMsgId.REC_SUB_C_BETTING,"wb",GameCommon:getRoleChairID(),var)
@@ -137,7 +168,7 @@ function TableLayer:doAction(action,pBuffer)
             if #tableBettingType >= 7 then
                 uiListView_betting:setItemsMargin(10)
             elseif #tableBettingType <= 2 then
-                uiListView_betting:setItemsMargin(50)
+                uiListView_betting:setItemsMargin(60)
             end
             uiListView_betting:setDirection(ccui.ListViewDirection.horizontal)
             uiListView_betting:refreshView()
@@ -158,7 +189,10 @@ function TableLayer:doAction(action,pBuffer)
         local uiPanel_player = ccui.Helper:seekWidgetByName(self.root,string.format("Panel_player%d",viewID))
         local uiImage_betting = ccui.Helper:seekWidgetByName(uiPanel_player,"Image_betting")
         uiImage_betting:setVisible(true)
-        uiImage_betting:loadTexture(string.format("puke/table/pukenew_score_%d.png",pBuffer.cbBetting))
+
+        local uiText_fenshu = ccui.Helper:seekWidgetByName(uiPanel_player,"Text_fenshu")
+        uiText_fenshu:setString(string.format("%d分",pBuffer.cbBetting))
+        --uiImage_betting:loadTexture(string.format("puke/table/pukenew_score_%d.png",pBuffer.cbBetting))
         uiImage_betting:runAction(cc.Sequence:create(cc.ScaleTo:create(0.1,1.2),cc.ScaleTo:create(0.1,1),cc.CallFunc:create(function(sender,event) EventMgr:dispatch(EventType.EVENT_TYPE_CACEL_MESSAGE_BLOCK) end)))
         
     elseif action == NetMsgId.REC_SUB_S_GRAB_BANKER then

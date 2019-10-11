@@ -60,6 +60,7 @@ function NewClubSetLayer:onConfig()
     self.isRecordOver = false   --记录请求是否结束
     self.curRecordEndTime = 0   --记录上次请求结束时间
     self.isUseSave = false      --是否按保存修改
+    self.playwayData = {}
 end
 
 function NewClubSetLayer:onEnter()
@@ -70,6 +71,7 @@ function NewClubSetLayer:onEnter()
     EventMgr:registListener(EventType.RET_GET_CLUB_OPERATE_RECORD,self,self.RET_GET_CLUB_OPERATE_RECORD)
     EventMgr:registListener(EventType.RET_GET_CLUB_OPERATE_RECORD_FINISH,self,self.RET_GET_CLUB_OPERATE_RECORD_FINISH)
     EventMgr:registListener(EventType.RET_SETTINGS_CLUB_PLAY,self,self.RET_SETTINGS_CLUB_PLAY)
+    EventMgr:registListener(EventType.RET_SETTINGS_CLUB_PLAY_FINISH,self,self.RET_SETTINGS_CLUB_PLAY_FINISH)
 end
 
 function NewClubSetLayer:onExit()
@@ -80,6 +82,7 @@ function NewClubSetLayer:onExit()
     EventMgr:unregistListener(EventType.RET_GET_CLUB_OPERATE_RECORD,self,self.RET_GET_CLUB_OPERATE_RECORD)
     EventMgr:unregistListener(EventType.RET_GET_CLUB_OPERATE_RECORD_FINISH,self,self.RET_GET_CLUB_OPERATE_RECORD_FINISH)
     EventMgr:unregistListener(EventType.RET_SETTINGS_CLUB_PLAY,self,self.RET_SETTINGS_CLUB_PLAY)
+    EventMgr:unregistListener(EventType.RET_SETTINGS_CLUB_PLAY_FINISH,self,self.RET_SETTINGS_CLUB_PLAY_FINISH)
     self.Panel_item:release()
 end
 
@@ -418,11 +421,36 @@ function NewClubSetLayer:initInfoPage()
     end
 end
 
+function NewClubSetLayer:getPlayWayNums()
+    local num = 0
+    for i,v in ipairs(self.clubData.wKindID or {}) do
+        local gameinfo = StaticData.Games[v]
+        if gameinfo then
+            num = num + 1
+        end
+    end
+    return num
+end
+
 function NewClubSetLayer:initWayPage()
-    self.ListView_playway:removeAllItems()
+    local isEnd = false
+    local curMaxPlaywayNum = 0
+
+    local items = self.ListView_playway:getChildren()
+    local playwaynum = self:getPlayWayNums()
+    for i=playwaynum+1, #items do
+        items[i]:removeFromParent()
+        items[i] = nil
+    end
+
+    --self.ListView_playway:removeAllItems()
     for i,id in ipairs(self.clubData.dwPlayID) do
-        local item = self.Image_item:clone()
-        self.ListView_playway:pushBackCustomItem(item)
+        local item = items[i]
+        if not item then
+            item = self.Image_item:clone()
+            self.ListView_playway:pushBackCustomItem(item)
+        end
+
         local Panel_noway = ccui.Helper:seekWidgetByName(item, 'Panel_noway')
         local Button_addway = ccui.Helper:seekWidgetByName(item, 'Button_addway')
         local Panel_yesway = ccui.Helper:seekWidgetByName(item, 'Panel_yesway')
@@ -505,6 +533,7 @@ function NewClubSetLayer:initWayPage()
         else
             Panel_noway:setVisible(true)
             Panel_yesway:setVisible(false)
+            isEnd = true
         end
 
         if self.clubData.dwUserID == UserData.User.userID or self:isAdmin(UserData.User.userID) then
@@ -541,6 +570,36 @@ function NewClubSetLayer:initWayPage()
             self:addChild(roomNode)
             roomNode.data = {playid = id, settype = 3, idx = i}
             roomNode:setName('RoomCreateLayer')
+        end)
+
+        if isEnd then
+            break
+        else
+            curMaxPlaywayNum = i
+        end
+    end
+
+    if not isEnd then
+        local item = self.Image_item:clone()
+        self.ListView_playway:pushBackCustomItem(item)
+        local Panel_noway = ccui.Helper:seekWidgetByName(item, 'Panel_noway')
+        local Button_addway = ccui.Helper:seekWidgetByName(item, 'Button_addway')
+        local Panel_yesway = ccui.Helper:seekWidgetByName(item, 'Panel_yesway')
+        local Text_addPlayWay = ccui.Helper:seekWidgetByName(item, 'Text_addPlayWay')
+        Text_addPlayWay:setColor(cc.c3b(120,6,6))
+        Panel_noway:setVisible(true)
+        Panel_yesway:setVisible(false)
+        Button_addway:setPressedActionEnabled(true)
+        Button_addway:addClickEventListener(function(sender)
+            require("common.Common"):playEffect("common/buttonplay.mp3")
+            if self.clubData.dwUserID == UserData.User.userID or self:isAdmin(UserData.User.userID) then
+                local roomNode = require("app.MyApp"):create(self.clubData.wKindID[i],1):createView("RoomCreateLayer")
+                self:addChild(roomNode)
+                roomNode.data = {playid = 0, settype = 1, idx = curMaxPlaywayNum+1}
+                roomNode:setName('RoomCreateLayer')
+            else
+                require("common.MsgBoxLayer"):create(0,nil,"请联系管理员添加玩法")
+            end
         end)
     end
 end
@@ -663,9 +722,36 @@ function NewClubSetLayer:RET_SETTINGS_CLUB_PLAY(event)
         require("common.MsgBoxLayer"):create(0,nil,"设置玩法失败")
         return
     end
-    require("common.MsgBoxLayer"):create(0,nil,"设置玩法成功")
-    UserData.Guild:refreshClub(data.dwClubID)
-    self:megerClubData(data)
+
+    if data.cbPlayCount <= 10 then
+        self.playwayData = {}
+    end
+    self.playwayData = self.playwayData or {}
+    for k,v in pairs(data) do
+        if type(v) == 'table' and self.playwayData[k] then
+            for m,n in ipairs(v) do
+                table.insert(self.playwayData[k], n)
+            end
+        else
+            self.playwayData[k] = v
+        end
+	end
+end
+
+function NewClubSetLayer:RET_SETTINGS_CLUB_PLAY_FINISH(event)
+    local data = event._usedata
+    --Log.d(self.playwayData)
+
+    if self.playwayData.cbSettingsType == 2 then
+        require("common.MsgBoxLayer"):create(0,nil,"删除玩法成功")
+    elseif self.playwayData.cbSettingsType == 3 then
+        require("common.MsgBoxLayer"):create(0,nil,"修改玩法成功")
+    else
+        require("common.MsgBoxLayer"):create(0,nil,"添加玩法成功")
+    end
+
+    UserData.Guild:refreshClub(self.playwayData.dwClubID)
+    self:megerClubData(self.playwayData)
     self:initWayPage()
 end
 

@@ -88,15 +88,78 @@ function RoomCreateLayer:initUI()
     local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(0),"ListView_parameter"):getItems()
     uiListView_parameterList:getItem(0):setVisible(false)
     Common:addCheckTouchEventListener(items)
-    --选择底注
+
+    --选择人数
     local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(1),"ListView_parameter"):getItems()
     Common:addCheckTouchEventListener(items)
-    if self.recordCreateParameter["bBettingType"] ~= nil and self.recordCreateParameter["bBettingType"] == 2 then
+    if self.recordCreateParameter["bPlayerCount"] ~= nil and self.recordCreateParameter["bPlayerCount"] == 6 then
+        items[1]:setBright(true)
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[1],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(215,86,31))
+        end
+    else
         items[2]:setBright(true)
         local uiText_desc = ccui.Helper:seekWidgetByName(items[2],"Text_desc")
         if uiText_desc ~= nil then 
             uiText_desc:setTextColor(cc.c3b(215,86,31))
         end
+    end
+    --选择底注
+    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(2),"ListView_parameter"):getItems()
+    Common:addCheckTouchEventListener(items,false,function(index) 
+        local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(3),"ListView_parameter"):getItems()   
+        if index == 1 or index == 2 or index == 3 or index == 4 then
+            for key, var in pairs(items) do
+               -- var:setColor(cc.c3b(170,170,170))
+                var:setBright(false)
+                local uiText_desc = ccui.Helper:seekWidgetByName(var,"Text_desc")
+                if uiText_desc ~= nil then 
+                    uiText_desc:setTextColor(cc.c3b(109,58,44))
+                end
+            end
+        end
+        local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(4),"ListView_parameter"):getItems()   
+        if index == 1 or index == 2 or index == 3 or index == 4 then
+            for key, var in pairs(items) do
+               -- var:setColor(cc.c3b(170,170,170))
+                var:setBright(false)
+                local uiText_desc = ccui.Helper:seekWidgetByName(var,"Text_desc")
+                if uiText_desc ~= nil then 
+                    uiText_desc:setTextColor(cc.c3b(109,58,44))
+                end
+            end
+        end
+    end )
+    if self.recordCreateParameter["bBettingType"] == nil or self.recordCreateParameter["bBettingType"] == 3 then
+        items[1]:setBright(true)
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[1],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(215,86,31))
+        end
+    elseif self.recordCreateParameter["bBettingType"] ~= nil and self.recordCreateParameter["bBettingType"] == 4 then
+        items[2]:setBright(true)
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[2],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(215,86,31))
+        end
+    elseif self.recordCreateParameter["bBettingType"] ~= nil and self.recordCreateParameter["bBettingType"] == 5 then
+        items[3]:setBright(true)
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[3],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(215,86,31))
+        end
+    elseif self.recordCreateParameter["bBettingType"] ~= nil and self.recordCreateParameter["bBettingType"] == 6 then
+        items[4]:setBright(true)
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[4],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(215,86,31))
+        end
+    elseif self.recordCreateParameter["bBettingType"] ~= nil and self.recordCreateParameter["bBettingType"] == 7 then
+    elseif self.recordCreateParameter["bBettingType"] ~= nil and self.recordCreateParameter["bBettingType"] == 8 then
+    elseif self.recordCreateParameter["bBettingType"] ~= nil and self.recordCreateParameter["bBettingType"] == 9 then
+    elseif self.recordCreateParameter["bBettingType"] ~= nil and self.recordCreateParameter["bBettingType"] == 1 then
+    elseif self.recordCreateParameter["bBettingType"] ~= nil and self.recordCreateParameter["bBettingType"] == 2 then
     else
         items[1]:setBright(true)
         local uiText_desc = ccui.Helper:seekWidgetByName(items[1],"Text_desc")
@@ -104,10 +167,117 @@ function RoomCreateLayer:initUI()
             uiText_desc:setTextColor(cc.c3b(215,86,31))
         end
     end
-    --选择庄家
-    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(2),"ListView_parameter"):getItems()
+
+    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(3),"ListView_parameter"):getItems()
     Common:addCheckTouchEventListener(items,false,function(index) 
-        local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(3),"ListView_parameter"):getItems()
+        local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(2),"ListView_parameter"):getItems()   
+        if index == 1 or index == 2 or index == 3 then
+            for key, var in pairs(items) do
+             --   var:setColor(cc.c3b(170,170,170))
+                var:setBright(false)
+                local uiText_desc = ccui.Helper:seekWidgetByName(var,"Text_desc")
+                if uiText_desc ~= nil then 
+                    uiText_desc:setTextColor(cc.c3b(109,58,44))
+                end
+            end
+        end
+
+        local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(4),"ListView_parameter"):getItems()   
+        if index == 1 or index == 2 or index == 3 then
+            for key, var in pairs(items) do
+             --   var:setColor(cc.c3b(170,170,170))
+                var:setBright(false)
+                local uiText_desc = ccui.Helper:seekWidgetByName(var,"Text_desc")
+                if uiText_desc ~= nil then 
+                    uiText_desc:setTextColor(cc.c3b(109,58,44))
+                end
+            end
+        end
+    end )
+    if self.recordCreateParameter["bBettingType"] == nil or self.recordCreateParameter["bBettingType"] == 3 then
+    elseif self.recordCreateParameter["bBettingType"] ~= nil and self.recordCreateParameter["bBettingType"] == 1 then
+    elseif self.recordCreateParameter["bBettingType"] ~= nil and self.recordCreateParameter["bBettingType"] == 2 then
+    elseif self.recordCreateParameter["bBettingType"] ~= nil and self.recordCreateParameter["bBettingType"] == 4 then
+
+    elseif self.recordCreateParameter["bBettingType"] ~= nil and self.recordCreateParameter["bBettingType"] == 5 then
+
+    elseif self.recordCreateParameter["bBettingType"] ~= nil and self.recordCreateParameter["bBettingType"] == 6 then
+
+    elseif self.recordCreateParameter["bBettingType"] ~= nil and self.recordCreateParameter["bBettingType"] == 7 then
+        items[1]:setBright(true)
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[1],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(215,86,31))
+        end
+    elseif self.recordCreateParameter["bBettingType"] ~= nil and self.recordCreateParameter["bBettingType"] == 8 then
+        items[2]:setBright(true)
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[2],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(215,86,31))
+        end
+    elseif self.recordCreateParameter["bBettingType"] ~= nil and self.recordCreateParameter["bBettingType"] == 9 then
+        items[3]:setBright(true)
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[3],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(215,86,31))
+        end
+    end
+
+    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(4),"ListView_parameter"):getItems()
+    Common:addCheckTouchEventListener(items,false,function(index) 
+        local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(2),"ListView_parameter"):getItems()   
+        if index == 1 or index == 2 then
+            for key, var in pairs(items) do
+             --   var:setColor(cc.c3b(170,170,170))
+                var:setBright(false)
+                local uiText_desc = ccui.Helper:seekWidgetByName(var,"Text_desc")
+                if uiText_desc ~= nil then 
+                    uiText_desc:setTextColor(cc.c3b(109,58,44))
+                end
+            end
+        end
+
+        local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(3),"ListView_parameter"):getItems()   
+        if index == 1 or index == 2 then
+            for key, var in pairs(items) do
+             --   var:setColor(cc.c3b(170,170,170))
+                var:setBright(false)
+                local uiText_desc = ccui.Helper:seekWidgetByName(var,"Text_desc")
+                if uiText_desc ~= nil then 
+                    uiText_desc:setTextColor(cc.c3b(109,58,44))
+                end
+            end
+        end
+    end )
+
+    if self.recordCreateParameter["bBettingType"] == nil or self.recordCreateParameter["bBettingType"] == 3 then
+    elseif self.recordCreateParameter["bBettingType"] ~= nil and self.recordCreateParameter["bBettingType"] == 1 then
+        items[1]:setBright(true)
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[1],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(215,86,31))
+        end
+    elseif self.recordCreateParameter["bBettingType"] ~= nil and self.recordCreateParameter["bBettingType"] == 2 then
+        items[2]:setBright(true)
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[2],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(215,86,31))
+        end
+    elseif self.recordCreateParameter["bBettingType"] ~= nil and self.recordCreateParameter["bBettingType"] == 4 then
+
+    elseif self.recordCreateParameter["bBettingType"] ~= nil and self.recordCreateParameter["bBettingType"] == 5 then
+
+    elseif self.recordCreateParameter["bBettingType"] ~= nil and self.recordCreateParameter["bBettingType"] == 6 then
+
+    elseif self.recordCreateParameter["bBettingType"] ~= nil and self.recordCreateParameter["bBettingType"] == 7 then
+    elseif self.recordCreateParameter["bBettingType"] ~= nil and self.recordCreateParameter["bBettingType"] == 8 then
+    elseif self.recordCreateParameter["bBettingType"] ~= nil and self.recordCreateParameter["bBettingType"] == 9 then
+    end
+
+    --选择庄家
+    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(5),"ListView_parameter"):getItems()
+    Common:addCheckTouchEventListener(items,false,function(index) 
+        local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(6),"ListView_parameter"):getItems()
         if index == 2 then
             items[1]:setEnabled(true)
             items[1]:setColor(cc.c3b(255,255,255))            
@@ -127,7 +297,7 @@ function RoomCreateLayer:initUI()
         end
 
         -- 控制搓牌
-        local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(7),"ListView_parameter"):getItems()
+        local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(10),"ListView_parameter"):getItems()
         if index == 2 then
             items[1]:setVisible(true)
             items[1]:setEnabled(true)
@@ -199,13 +369,13 @@ function RoomCreateLayer:initUI()
         end
     end
     --特殊选项
-    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(3),"ListView_parameter"):getItems()
+    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(6),"ListView_parameter"):getItems()
     Common:addCheckTouchEventListener(items,true,function(index) 
         if index == 3 then
-            local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(3),"ListView_parameter"):getItems() 
+            local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(6),"ListView_parameter"):getItems() 
             local target = items[index]
             if target:isBright() then
-                local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(5),"ListView_parameter"):getItems()
+                local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(8),"ListView_parameter"):getItems()
                 for key, var in pairs(items) do
                     var:setColor(cc.c3b(170,170,170))
                     var:setEnabled(false)
@@ -215,7 +385,7 @@ function RoomCreateLayer:initUI()
                         uiText_desc:setTextColor(cc.c3b(109,58,44))
                     end
                 end 
-                local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(4),"ListView_parameter"):getItems()
+                local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(7),"ListView_parameter"):getItems()
                 for key, var in pairs(items) do
                     var:setColor(cc.c3b(170,170,170))
                     var:setEnabled(false)
@@ -226,7 +396,7 @@ function RoomCreateLayer:initUI()
                     end
                 end 
             else
-                local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(5),"ListView_parameter"):getItems()
+                local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(8),"ListView_parameter"):getItems()
                 for key, var in pairs(items) do
                     var:setColor(cc.c3b(255,255,255))
                     var:setEnabled(true)
@@ -244,7 +414,7 @@ function RoomCreateLayer:initUI()
                         end
                     end
                 end
-                local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(4),"ListView_parameter"):getItems()
+                local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(7),"ListView_parameter"):getItems()
                 for key, var in pairs(items) do
                     var:setColor(cc.c3b(255,255,255))
                     var:setEnabled(true)
@@ -300,7 +470,7 @@ function RoomCreateLayer:initUI()
             uiText_desc:setTextColor(cc.c3b(215,86,31))
         end
     end
-    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(4),"ListView_parameter"):getItems()
+    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(7),"ListView_parameter"):getItems()
     Common:addCheckTouchEventListener(items,true)
     if self.recordCreateParameter["bNiuType_Flush"] ~= nil and self.recordCreateParameter["bNiuType_Flush"] == 1 then
         items[1]:setBright(true)
@@ -349,7 +519,7 @@ function RoomCreateLayer:initUI()
         end
     end 
     --选择赔率
-    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(5),"ListView_parameter"):getItems()
+    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(8),"ListView_parameter"):getItems()
     Common:addCheckTouchEventListener(items)
     if self.recordCreateParameter["bSettlementType"] ~= nil and self.recordCreateParameter["bSettlementType"] == 1 then
         items[1]:setBright(true)
@@ -380,7 +550,7 @@ function RoomCreateLayer:initUI()
         end
     end
     --庄家倍数
-    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(6),"ListView_parameter"):getItems()
+    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(9),"ListView_parameter"):getItems()
     Common:addCheckTouchEventListener(items)
     if self.recordCreateParameter["bMultiple"] ~= nil and self.recordCreateParameter["bMultiple"] == 1 then
         items[1]:setBright(true)
@@ -409,7 +579,7 @@ function RoomCreateLayer:initUI()
     end    
 
     --搓牌
-    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(7),"ListView_parameter"):getItems()
+    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(10),"ListView_parameter"):getItems()
     Common:addCheckTouchEventListener(items,true)
     if self.recordCreateParameter["bBankerType"] == nil or self.recordCreateParameter["bBankerType"] ~= 1 then
         items[1]:setBright(false)
@@ -570,17 +740,43 @@ function RoomCreateLayer:setParameter()
     else
         return
     end
-    --选择底注
+    --选择人数
     local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(1),"ListView_parameter"):getItems()
+    self.tableParameter.bPlayerCount = 8
+    if items[1]:isBright() then
+        self.tableParameter.bPlayerCount = 6
+    elseif items[2]:isBright() then
+        self.tableParameter.bPlayerCount = 8
+    end
+
+    --选择底注
+    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(2),"ListView_parameter"):getItems()
+    if items[1]:isBright() then
+        self.tableParameter.bBettingType = 3
+    elseif items[2]:isBright() then
+        self.tableParameter.bBettingType = 4
+    elseif items[3]:isBright() then
+        self.tableParameter.bBettingType = 5
+    elseif items[4]:isBright() then
+        self.tableParameter.bBettingType = 6
+    end
+    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(3),"ListView_parameter"):getItems()
+    if items[1]:isBright() then
+        self.tableParameter.bBettingType = 7
+    elseif items[2]:isBright() then
+        self.tableParameter.bBettingType = 8
+    elseif items[3]:isBright() then
+        self.tableParameter.bBettingType = 9
+    end
+
+    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(4),"ListView_parameter"):getItems()
     if items[1]:isBright() then
         self.tableParameter.bBettingType = 1
     elseif items[2]:isBright() then
         self.tableParameter.bBettingType = 2
-    else
-        return
     end
     --选择庄家
-    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(2),"ListView_parameter"):getItems()
+    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(5),"ListView_parameter"):getItems()
     if items[1]:isBright() then
         self.tableParameter.bBankerType = 0
     elseif items[2]:isBright() then
@@ -595,7 +791,7 @@ function RoomCreateLayer:setParameter()
         return
     end
     --特殊选项
-    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(3),"ListView_parameter"):getItems()
+    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(6),"ListView_parameter"):getItems()
     if items[1]:isBright() then
         self.tableParameter.bPush = 1
     else
@@ -611,7 +807,7 @@ function RoomCreateLayer:setParameter()
     else
         self.tableParameter.bCanPlayingJoin = 0
     end
-    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(4),"ListView_parameter"):getItems()
+    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(7),"ListView_parameter"):getItems()
     if items[1]:isBright() then
         self.tableParameter.bNiuType_Flush = 1
     else
@@ -633,7 +829,7 @@ function RoomCreateLayer:setParameter()
         self.tableParameter.bNiuType_Straight = 0
     end
     --选择赔率
-    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(5),"ListView_parameter"):getItems()
+    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(8),"ListView_parameter"):getItems()
     if items[1]:isBright() then
         self.tableParameter.bSettlementType = 1
     elseif items[2]:isBright() then
@@ -644,7 +840,7 @@ function RoomCreateLayer:setParameter()
         self.tableParameter.bSettlementType = 0
     end
     --庄家倍数
-    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(6),"ListView_parameter"):getItems()
+    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(9),"ListView_parameter"):getItems()
     if items[1]:isBright() then
         self.tableParameter.bMultiple = 1
     elseif items[2]:isBright() then
@@ -656,13 +852,13 @@ function RoomCreateLayer:setParameter()
     else
         return
     end 
-    self.tableParameter.bPlayerCount = 8
+
     if self.showType == 3 then
         self.tableParameter.bPlayerCount = 2
     end
 
     --搓牌
-    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(7),"ListView_parameter"):getItems()
+    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(10),"ListView_parameter"):getItems()
     if items[1]:isBright() then
         self.tableParameter.bCuopai = 1
     else

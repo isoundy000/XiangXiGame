@@ -772,7 +772,9 @@ function GameLayer:OnGameMessageRun(_tagMsg)
                             local uiPanel_player = ccui.Helper:seekWidgetByName(self.root,string.format("Panel_player%d",viewID))
                             local uiImage_betting = ccui.Helper:seekWidgetByName(uiPanel_player,"Image_betting")
                             uiImage_betting:setVisible(true)
-                            uiImage_betting:loadTexture(string.format("puke/table/pukenew_score_%d.png",pBuffer.cbBetting[i]))
+                            local uiText_fenshu = ccui.Helper:seekWidgetByName(uiPanel_player,"Text_fenshu")
+                            uiText_fenshu:setString(string.format("%d分",pBuffer.cbBetting))
+                            --uiImage_betting:loadTexture(string.format("puke/table/pukenew_score_%d.png",pBuffer.cbBetting[i]))
                         end
                         if pBuffer.cbShow[i] == true then
                             self.tableLayer:setHandCard(i,pBuffer.stuCompareCard[i].cbCardData)
